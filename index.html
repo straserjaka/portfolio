@@ -9,51 +9,84 @@
   <meta property="og:title" content="Jaka Štraser, full-stack razvijalec">
   <meta property="og:description" content="Spletne in mobilne aplikacije, od baze do vmesnika.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Ccircle cx='22' cy='22' r='4.5' fill='%238EF0A4'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230A0A0A'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E">
   <script>
     /* Gibanje vklopimo samo, če JS deluje in uporabnik ni zahteval manj gibanja. */
     (function () {
       var d = document.documentElement;
       d.classList.add('js');
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('motion');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('motion', 'loading');
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Geist:wght@400..700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <a class="skip" href="#projekti">Preskoči na projekte</a>
 
+  <!-- NALAGANJE: monogram se nariše, števec teče, zavesa se dvigne -->
+  <div class="loader" aria-hidden="true">
+    <svg class="loader__mark" viewBox="0 0 200 200">
+      <circle class="lm-ring" cx="100" cy="100" r="92" pathLength="1"/>
+      <circle class="lm-ring lm-ring--in" cx="100" cy="100" r="80" pathLength="1"/>
+      <text class="lm-text" x="100" y="124" text-anchor="middle">JŠ</text>
+    </svg>
+    <p class="loader__name">Jaka Štraser</p>
+    <p class="loader__count"><span>000</span></p>
+    <span class="loader__bar"><i></i></span>
+  </div>
+
   <div class="progress" aria-hidden="true"></div>
 
-  <main id="top">
+  <header class="nav">
+    <a class="logo" href="#top" aria-label="Jaka Štraser, na vrh">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22.5"/><text x="24" y="31" text-anchor="middle">JŠ</text></svg>
+    </a>
+    <nav class="menu" aria-label="Glavna navigacija">
+      <a href="#projekti">Projekti</a>
+      <a href="#pot">Pot</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+  </header>
 
-    <!-- HERO: ime je slika -->
-    <header class="hero g-dark">
-      <div class="planes planes--back" aria-hidden="true"><span class="pl pl--glow"></span><span class="pl pl--grid"></span></div>
-      <div class="hero__bar">
-        <p class="status"><span class="status__dot" aria-hidden="true"></span>Na voljo za delo</p>
-        <nav class="menu" aria-label="Glavna navigacija">
-          <a href="#projekti">Projekti</a>
-          <a href="#pot">Pot</a>
-          <a href="#kontakt">Kontakt</a>
-        </nav>
+  <main>
+
+    <!-- HERO -->
+    <section class="hero g-dark" id="top" aria-label="Uvod">
+      <div class="hero__fx" aria-hidden="true">
+        <span class="spot"></span>
+        <span class="ring ring--a"></span>
+        <span class="ring ring--b"></span>
       </div>
 
       <div class="hero__body">
+        <p class="status"><span class="status__dot" aria-hidden="true"></span>Na voljo za delo<span class="status__sep">·</span>Ptuj / Maribor</p>
         <h1 class="name">
           <span class="name__line name__line--a">Jaka</span>
           <span class="name__line name__line--b">Štraser</span>
         </h1>
-        <div class="hero__intro">
-          <p>Full-stack razvijalec iz Ptuja. Spletne in mobilne aplikacije, od baze do vmesnika.</p>
-          <a class="btn" href="#kontakt">Pišite mi<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+        <div class="hero__foot">
+          <p class="hero__intro">Full-stack razvijalec. Spletne in mobilne aplikacije, od baze do vmesnika.</p>
+          <div class="hero__cta">
+            <a class="btn btn--solid" href="#kontakt"><span>Pišite mi</span><i class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></i></a>
+            <a class="btn btn--line" href="#projekti"><span>Projekti</span></a>
+          </div>
         </div>
       </div>
-      <div class="planes planes--front" aria-hidden="true"><span class="pl pl--ring"></span><span class="pl pl--dot"></span><span class="pl pl--bar"></span></div>
-    </header>
+
+      <div class="ticker" aria-label="Tehnologije">
+        <div class="ticker__track">
+          <ul>
+            <li>JavaScript</li><li>Angular</li><li>React</li><li>Node.js</li><li>MongoDB</li><li>SQL</li><li>Flutter</li><li>Dart</li><li>C++</li><li>Python</li>
+          </ul>
+          <ul aria-hidden="true">
+            <li>JavaScript</li><li>Angular</li><li>React</li><li>Node.js</li><li>MongoDB</li><li>SQL</li><li>Flutter</li><li>Dart</li><li>C++</li><li>Python</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
     <!-- AKT: stavek, pika ga požre -->
     <section class="act g-dark" aria-labelledby="stavek">
@@ -69,29 +102,33 @@
     <!-- PROJEKTI -->
     <section class="work g-paper" id="projekti" aria-label="Projekti">
       <ol class="work__list">
-        <li class="work__item" data-reveal data-tone="signal">
+        <li class="work__item" data-reveal>
+          <span class="work__no">(01)</span>
           <p class="work__kind">Lastni projekt</p>
           <h3 class="work__title">TripPlaner</h3>
           <p class="work__desc">Aplikacija za načrtovanje izletov v hribe: kje parkirati, mnenja ljudi, ki so pot že prehodili, in vse ključne informacije o poti na enem mestu.</p>
-          <p class="work__stack">Full-stack, planinske poti</p>
+          <ul class="chips"><li>Full-stack</li><li>Planinske poti</li></ul>
         </li>
-        <li class="work__item" data-reveal data-tone="dark">
+        <li class="work__item" data-reveal>
+          <span class="work__no">(02)</span>
           <p class="work__kind">Spletna aplikacija</p>
           <h3 class="work__title">BookWithStraser</h3>
           <p class="work__desc">Platforma za rezervacije z avtentikacijo, upravljanjem terminov in REST API-jem.</p>
-          <p class="work__stack">Angular, Node.js, MongoDB</p>
+          <ul class="chips"><li>Angular</li><li>Node.js</li><li>MongoDB</li></ul>
         </li>
-        <li class="work__item" data-reveal data-tone="mint">
+        <li class="work__item" data-reveal>
+          <span class="work__no">(03)</span>
           <p class="work__kind">Mobilna aplikacija</p>
           <h3 class="work__title">Road Alert</h3>
           <p class="work__desc">Prikaz prometnih podatkov v Sloveniji v realnem času: zastoji, dela na cesti in opozorila.</p>
-          <p class="work__stack">Flutter, Dart, API</p>
+          <ul class="chips"><li>Flutter</li><li>Dart</li><li>API</li></ul>
         </li>
-        <li class="work__item" data-reveal data-tone="dark">
+        <li class="work__item" data-reveal>
+          <span class="work__no">(04)</span>
           <p class="work__kind">Orodje</p>
           <h3 class="work__title">metaCleaner</h3>
           <p class="work__desc">Orodje za odstranjevanje metapodatkov iz slik, za več zasebnosti pri deljenju fotografij.</p>
-          <p class="work__stack">C++, JavaScript</p>
+          <ul class="chips"><li>C++</li><li>JavaScript</li></ul>
         </li>
       </ol>
     </section>
@@ -99,44 +136,58 @@
     <!-- POT -->
     <section class="path g-dark" id="pot" aria-labelledby="pot-h">
       <div class="path__side">
-        <h2 id="pot-h" class="path__h">Pot do sem.</h2>
-        <p class="path__tools"><span>Orodja</span>JavaScript, Angular, React, Node.js, MongoDB, SQL, Flutter, Dart, C++, Python</p>
+        <h2 id="pot-h" class="path__h">Pot <em>do sem.</em></h2>
+        <p class="path__label">Orodja</p>
+        <ul class="chips">
+          <li>JavaScript</li><li>Angular</li><li>React</li><li>Node.js</li><li>MongoDB</li><li>SQL</li><li>Flutter</li><li>Dart</li><li>C++</li><li>Python</li>
+        </ul>
       </div>
       <ol class="path__list">
         <li data-reveal>
           <span class="path__when">Zdaj</span>
-          <h3>Informatika in tehnologije komuniciranja</h3>
-          <p>Univerzitetni študij</p>
+          <div>
+            <h3>Informatika in tehnologije komuniciranja</h3>
+            <p>Univerzitetni študij</p>
+          </div>
         </li>
         <li data-reveal>
           <span class="path__when">2026</span>
-          <h3>ACM Web Programming Competition</h3>
-          <p>Tekmovanje v spletnem programiranju</p>
+          <div>
+            <h3>ACM Web Programming Competition</h3>
+            <p>Tekmovanje v spletnem programiranju</p>
+          </div>
         </li>
         <li data-reveal>
           <span class="path__when">Praksa</span>
-          <h3>Talum d.d.</h3>
-          <p>Delovna praksa</p>
+          <div>
+            <h3>Talum d.d.</h3>
+            <p>Delovna praksa</p>
+          </div>
         </li>
         <li data-reveal>
           <span class="path__when">Srednja šola</span>
-          <h3>Elektro in računalniška šola Ptuj</h3>
-          <p>Smer računalništvo</p>
+          <div>
+            <h3>Elektro in računalniška šola Ptuj</h3>
+            <p>Smer računalništvo</p>
+          </div>
         </li>
       </ol>
     </section>
-    <!-- KONTAKT: zadnji, najglasnejši zaslon -->
-    <section class="close g-signal" id="kontakt" aria-labelledby="kontakt-h">
-      <span class="close__ring" aria-hidden="true"></span>
-      <h2 id="kontakt-h" class="close__h">Iščete<br>razvijalca?</h2>
+
+    <!-- KONTAKT -->
+    <section class="close g-paper" id="kontakt" aria-labelledby="kontakt-h">
+      <div class="close__top">
+        <p class="close__kicker">Kontakt</p>
+        <h2 id="kontakt-h" class="close__h">Iščete <em>razvijalca?</em></h2>
+      </div>
       <div class="close__body">
         <p class="close__lead">Odprt sem za poletno in redno delo v regiji Ptuj / Maribor.</p>
         <!-- ZAMENJAJ: vpiši svoj e-mail in povezave (tudi v gumbu "Pišite mi" zgoraj) -->
-        <a class="close__mail" href="mailto:tvoj-email@primer.si">tvoj-email@primer.si<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg></a>
+        <a class="close__mail" href="mailto:tvoj-email@primer.si"><span>tvoj-email@primer.si</span><i class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></i></a>
         <p class="close__links">
-          <a href="https://github.com/straserjaka" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
-          <a href="CV.pdf" target="_blank" rel="noopener">Prenesi CV</a>
+          <a class="btn btn--line" href="https://github.com/straserjaka" target="_blank" rel="noopener"><span>GitHub</span></a>
+          <a class="btn btn--line" href="https://www.linkedin.com/" target="_blank" rel="noopener"><span>LinkedIn</span></a>
+          <a class="btn btn--line" href="CV.pdf" target="_blank" rel="noopener"><span>Prenesi CV</span></a>
         </p>
       </div>
       <footer class="close__foot">

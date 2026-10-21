@@ -4,13 +4,11 @@
   var root = document.documentElement;
   var motion = root.classList.contains('motion');
   var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  /* ---------- Hero: ime razdelimo na črke, velikost prilagodimo širini ---------- */
-  var body = document.querySelector('.hero__body');
-  var lines = Array.prototype.slice.call(document.querySelectorAll('.name__line'));
-  var letters = [];
-
-  lines.forEach(function (line) {
+  /* ---------- Hero: ime razdelimo na črke ---------- */
+  var letters = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.name__line'), function (line) {
     var text = line.textContent;
     line.textContent = '';
     line.setAttribute('aria-label', text);
@@ -18,49 +16,77 @@
       var s = document.createElement('span');
       s.className = 'ch';
       s.setAttribute('aria-hidden', 'true');
-      s.style.setProperty('--i', letters.length);
+      s.style.setProperty('--i', letters++);
       s.textContent = text[i];
       line.appendChild(s);
-      letters.push(s);
     }
   });
 
-  var BASE = 780, PEAK = 900;
+  /* ---------- Nalaganje: števec, nato zavesa ---------- */
+  var loader = document.querySelector('.loader');
+  var count = loader && loader.querySelector('.loader__count span');
+  var started = performance.now();
+  var MIN = 2100;                       /* dovolj, da se monogram nariše do konca */
+  var finished = false;
 
-  function fitName() {
-    var b = lines[1];
-    var avail = body.clientWidth * 0.96;
-    var cur = parseFloat(getComputedStyle(b).fontSize);
-    var w = b.getBoundingClientRect().width;
-    if (w > 0) body.style.setProperty('--fs', (cur * avail / w).toFixed(2) + 'px');
-  }
-
-  /* ---------- Podpis: pri kazalcu črke postanejo težje ---------- */
-  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  var pointer = null, raf = 0, weights = letters.map(function () { return BASE; });
-
-  function tick() {
-    var moving = false;
-    for (var i = 0; i < letters.length; i++) {
-      var r = letters[i].getBoundingClientRect();
-      var target = BASE;
-      if (pointer) {
-        var d = Math.hypot(pointer.x - (r.left + r.width / 2), pointer.y - (r.top + r.height / 2));
-        var k = clamp(1 - d / (r.height * 1.1), 0, 1);
-        target = BASE + (PEAK - BASE) * k * k;
-      }
-      weights[i] += (target - weights[i]) * 0.16;
-      if (Math.abs(target - weights[i]) > 0.5) moving = true; else weights[i] = target;
-      letters[i].style.fontWeight = Math.round(weights[i]);
+  function ready() {
+    if (finished) return;
+    finished = true;
+    root.classList.add('ready');
+    root.classList.remove('loading');
+    if (loader) {
+      loader.classList.add('is-done');
+      setTimeout(function () { loader.classList.add('is-gone'); }, 1200);
     }
-    raf = moving ? requestAnimationFrame(tick) : 0;
   }
-  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
 
-  if (motion && fine) {
-    var hero = document.querySelector('.hero');
-    hero.addEventListener('pointermove', function (e) { pointer = { x: e.clientX, y: e.clientY }; kick(); });
-    hero.addEventListener('pointerleave', function () { pointer = null; kick(); });
+  if (motion && loader) {
+    var assetsReady = false;
+    var fontsDone = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    var loaded = new Promise(function (res) {
+      if (document.readyState === 'complete') res(); else window.addEventListener('load', res);
+    });
+    Promise.all([fontsDone, loaded]).then(function () { assetsReady = true; });
+
+    (function step(now) {
+      var t = clamp((now - started) / MIN, 0, 1);
+      var e = 1 - Math.pow(1 - t, 3);
+      var p = Math.round(e * (assetsReady ? 100 : 96));
+      loader.style.setProperty('--load', (p / 100).toFixed(3));
+      count.textContent = ('00' + p).slice(-3);
+      if (t < 1 || !assetsReady) {
+        if (now - started > 6000) { ready(); return; }   /* varovalka pri počasni povezavi */
+        requestAnimationFrame(step);
+      } else {
+        count.textContent = '100';
+        setTimeout(ready, 250);
+      }
+    })(started);
+  } else {
+    ready();
+  }
+
+  /* ---------- Globina herou: kazalec in drsenje ---------- */
+  var hero = document.querySelector('.hero');
+  function depth() {
+    var y = window.scrollY;
+    if (y < window.innerHeight * 1.2) hero.style.setProperty('--sy', y.toFixed(0));
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    root.style.setProperty('--prog', max > 0 ? (y / max).toFixed(4) : 0);
+  }
+  if (motion) {
+    window.addEventListener('scroll', function () { requestAnimationFrame(depth); }, { passive: true });
+    depth();
+    if (fine) {
+      hero.addEventListener('pointermove', function (e) {
+        var r = hero.getBoundingClientRect();
+        var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        hero.style.setProperty('--px', (x - 0.5).toFixed(3));
+        hero.style.setProperty('--py', (y - 0.5).toFixed(3));
+        hero.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+        hero.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      });
+    }
   }
 
   /* ---------- Akt: besede se prižgejo, pika požre stran ---------- */
@@ -113,47 +139,23 @@
   }
 
   function layout() {
-    fitName();
     if (motion) { measure(); paintAct(); }
   }
 
-  if (motion) {
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
+  if (motion) window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', layout);
   layout();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
 
-
-  /* ---------- Globina herou: kazalec in drsenje premikata ravnine različno hitro ---------- */
-  var heroEl = document.querySelector('.hero');
-  var prog = 0;
-  function depth() {
-    var y = window.scrollY;
-    if (y < window.innerHeight * 1.2) heroEl.style.setProperty('--sy', y.toFixed(0));
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    root.style.setProperty('--prog', max > 0 ? (y / max).toFixed(4) : 0);
-  }
-  if (motion) {
-    window.addEventListener('scroll', function () { requestAnimationFrame(depth); }, { passive: true });
-    depth();
-    if (fine) {
-      heroEl.addEventListener('pointermove', function (e) {
-        var r = heroEl.getBoundingClientRect();
-        heroEl.style.setProperty('--px', ((e.clientX - r.left) / r.width - 0.5).toFixed(3));
-        heroEl.style.setProperty('--py', ((e.clientY - r.top) / r.height - 0.5).toFixed(3));
-      });
-    }
-  }
-
-  /* ---------- Projekti: ton se prižge na sredini zaslona (tudi na dotik) ---------- */
+  /* ---------- Projekti: vrstica počrni na sredini zaslona (tudi na dotik) ---------- */
   var rows = document.querySelectorAll('.work__item');
-  if (motion && 'IntersectionObserver' in window) {
+  if (motion && 'IntersectionObserver' in window && !fine) {
     var tone = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) { e.target.classList.toggle('is-on', e.isIntersecting); });
     }, { rootMargin: '-42% 0px -42% 0px' });
     rows.forEach(function (el) { tone.observe(el); });
   }
+
   /* ---------- Vrstice se pokažejo ob vstopu ---------- */
   var items = document.querySelectorAll('[data-reveal]');
   if (motion && 'IntersectionObserver' in window) {
