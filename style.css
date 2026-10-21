@@ -6,9 +6,9 @@
 
 :root {
   /* surove barve */
-  --dark:   #0C0D0B;
-  --paper:  #ECEBE3;
-  --signal: #FF6B3D;
+  --dark:   #0A0A0A;
+  --paper:  #FFFFFF;
+  --signal: #8EF0A4;
 
   /* ritem (osnova 4px) */
   --s1: .25rem; --s2: .5rem;  --s3: .75rem; --s4: 1rem;
@@ -43,7 +43,7 @@
   --ink: var(--dark);
   --soft: #4A4D43;
   --dim: #5F6256;
-  --mark: #A83A0C;
+  --mark: #0E6B2E;
   --rule: rgba(12, 13, 11, .28);
   background: var(--bg);
   color: var(--ink);
@@ -53,7 +53,7 @@
 .g-signal {
   --bg: var(--signal);
   --ink: var(--dark);
-  --soft: #2A130A;
+  --soft: #0F3A1D;
   --mark: var(--dark);
   --rule: rgba(12, 13, 11, .4);
   background: var(--bg);
@@ -558,9 +558,9 @@ ol { list-style: none; }
    Kobalt je komplement oranžni; oba stojita na skoraj črni podlagi.
    ========================================================== */
 :root {
-  --cobalt: #2B34E0;     /* papir na kobaltu 6.6:1 */
-  --cobalt-hi: #4A57FF;  /* le velik naslov (4.3:1, nad 3:1 za velike črke) */
-  --lime: #D7FF3F;       /* temna na limeti 15:1 */
+  --cobalt: #1E7A3F;     /* bela na tem zelenem siju 5,3:1 */
+  --cobalt-hi: #2FA356;  /* le velik naslov, 3,4:1 (nad 3:1) */
+  --lime: #FFFFFF;
 }
 
 .progress {
@@ -581,7 +581,7 @@ ol { list-style: none; }
 .pl--glow {
   width: 78vmax; height: 78vmax; border-radius: 50%;
   left: -18vmax; bottom: -34vmax;
-  background: radial-gradient(circle at 42% 38%, var(--cobalt-hi) 0%, var(--cobalt) 34%, rgba(43, 52, 224, 0) 70%);
+  background: radial-gradient(circle at 42% 38%, var(--cobalt-hi) 0%, var(--cobalt) 34%, rgba(30, 122, 63, 0) 70%);
   transform: translate3d(calc(var(--px) * -26px), calc(var(--py) * -18px + var(--sy) * .10px), 0);
 }
 /* mrežica, še počasnejša */
@@ -618,9 +618,8 @@ ol { list-style: none; }
 
 /* projekti: ton se prižge, ko vrstica prečka sredino zaslona */
 .work__item[data-tone="signal"] { --t-bg: var(--signal); --t-ink: var(--dark); --t-soft: #2A130A; --t-rule: rgba(12, 13, 11, .4); }
-.work__item[data-tone="cobalt"] { --t-bg: var(--cobalt); --t-ink: var(--paper); --t-soft: #DAD9F5; --t-rule: rgba(236, 235, 227, .35); }
+.work__item[data-tone="mint"]   { --t-bg: #D3F8DB; --t-ink: var(--dark); --t-soft: #1F4A2B; --t-rule: rgba(12, 13, 11, .3); }
 .work__item[data-tone="dark"]   { --t-bg: var(--dark);   --t-ink: var(--paper); --t-soft: #A9ADA0; --t-rule: rgba(236, 235, 227, .2); }
-.work__item[data-tone="lime"]   { --t-bg: var(--lime);   --t-ink: var(--dark);  --t-soft: #2E3A06; --t-rule: rgba(12, 13, 11, .4); }
 .work__item.is-on {
   --ink: var(--t-ink); --soft: var(--t-soft); --rule: var(--t-rule);
   background: var(--t-bg); color: var(--t-ink);
@@ -644,3 +643,46 @@ ol { list-style: none; }
   .pl, .progress { transform: none !important; }
   .pl--glow { transform: none !important; }
 }
+
+/* ==========================================================
+   KONTAKT, glasna različica: zaslon zapolnita naslov in e-pošta
+   ========================================================== */
+.close { position: relative; overflow: hidden; justify-content: space-between; gap: var(--s8); padding-top: var(--s8); }
+.close > * { position: relative; z-index: 1; }
+.close__h {
+  font-family: var(--display);
+  font-size: clamp(3.4rem, 14.5vw, 15rem);
+  font-weight: 800;
+  font-stretch: 80%;
+  letter-spacing: -.05em;
+  line-height: .84;
+  text-transform: uppercase;
+  color: var(--dark);
+}
+.close__ring {
+  position: absolute; z-index: 0;
+  width: 46vmax; height: 46vmax; border-radius: 50%;
+  right: -12vmax; top: -10vmax;
+  border: clamp(14px, 2.6vmax, 40px) solid var(--dark);
+}
+.close__body { max-width: none; gap: var(--s5); font-size: 1.125rem; }
+.close__lead { max-width: 30rem; color: var(--dark); font-size: 1.25rem; font-weight: 520; line-height: 1.4; }
+.close__mail {
+  display: inline-flex; align-items: center; gap: .3em; align-self: start;
+  max-width: 100%;
+  font-family: var(--display);
+  font-size: clamp(1.6rem, 5.4vw, 5.5rem);
+  font-weight: 780; font-stretch: 86%;
+  letter-spacing: -.035em; line-height: 1;
+  padding: var(--s3) 0;
+  overflow-wrap: anywhere;
+  text-decoration: underline; text-decoration-thickness: .06em; text-underline-offset: .12em;
+}
+.close__mail svg { width: .7em; height: .7em; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: square; transition: transform 200ms var(--ease); }
+.close__links { gap: var(--s2) var(--s6); font-weight: 600; }
+.close__foot { margin-top: 0; color: var(--dark); border-top-color: var(--dark); }
+@media (hover: hover) and (pointer: fine) {
+  .close__mail:hover svg { transform: translate(.08em, -.08em); }
+}
+.close__ring { width: 30vmax; height: 30vmax; right: -8vmax; top: 44%; }
+@media (max-width: 700px) { .close__ring { display: none; } }
