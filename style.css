@@ -256,7 +256,7 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 .motion .step.on .step__node { background: var(--white); border-color: var(--white); transform: scale(1.35); }
 
 @media (min-width: 801px) {
-  .motion .flow { height: 320vh; }
+  .motion .flow { height: 220vh; }
   .motion .flow__stage {
     position: sticky; top: 0; height: 100vh; height: 100svh;
     display: flex; flex-direction: column; justify-content: center;
