@@ -230,6 +230,7 @@ main { position: relative; z-index: 1; }
   align-items: end; padding-top: var(--s6); border-top: 1px solid var(--rule);
 }
 .hero__intro { font-size: 1.1875rem; line-height: 1.5; color: var(--soft); }
+.hero__intro strong { font-weight: 500; color: #fff; }
 .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s5); }
 .facts dt { color: var(--dim); margin-bottom: var(--s2); }
 .facts dd { font-size: .9375rem; line-height: 1.4; }
