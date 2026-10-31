@@ -41,6 +41,8 @@
     }
   }
 
+  setTimeout(ready, 7000);   /* varovalka: nalagalnik se nikoli ne zatakne */
+
   if (motion && loader) {
     var started = performance.now();
     var MIN = 2000;

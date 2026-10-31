@@ -44,7 +44,8 @@ html {
   background: var(--black);
   scroll-padding-top: 5rem;
 }
-html.loading { overflow: hidden; }
+html.loading { overflow: hidden; animation: unlock 0s 8s forwards; }
+@keyframes unlock { to { overflow: auto; } }
 
 body {
   font-family: var(--sans);
@@ -108,6 +109,8 @@ main { position: relative; z-index: 1; }
   background: var(--black); color: var(--white);
   transition: transform 1000ms cubic-bezier(.76, 0, .24, 1);
 }
+.js.motion .loader { animation: loader-away 0s 8s forwards; }
+@keyframes loader-away { to { visibility: hidden; opacity: 0; pointer-events: none; } }
 .loader.is-done { transform: translateY(-100%); pointer-events: none; }
 .loader.is-gone { display: none !important; }
 
