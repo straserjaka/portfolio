@@ -15,32 +15,20 @@
     (function () {
       var d = document.documentElement;
       d.classList.add('js');
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('motion', 'loading');
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('motion');
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
   <a class="skip" href="#delo">Preskoči na vsebino</a>
 
-  <!-- NALAGANJE: ime, črta, števec. Nato se zavesa dvigne. -->
-  <div class="loader" aria-hidden="true">
-    <div class="loader__inner">
-      <p class="loader__name">Jaka Štraser</p>
-      <div class="loader__row">
-        <span class="loader__line"><i></i></span>
-        <span class="loader__count">000</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Interaktivno ozadje: pike, ki se odzivajo na kazalec, dotik in klik -->
+  <!-- Subtilno ozadje: konturne črte, ki se rahlo odzivajo na kazalec -->
   <canvas class="bg" aria-hidden="true"></canvas>
-  <div class="progress" aria-hidden="true"></div>
 
   <header class="nav">
     <a class="logo" href="#top" aria-label="Jaka Štraser, na vrh">
@@ -48,64 +36,55 @@
       <span class="logo__txt">Jaka Štraser</span>
     </a>
     <nav class="menu" aria-label="Glavna navigacija">
-      <a href="#delo">Delo</a>
+      <a href="#delo">Kaj delam</a>
       <a href="#projekti">Projekti</a>
       <a href="#pot">Pot</a>
       <a href="#kontakt">Kontakt</a>
     </nav>
-    <p class="clock" aria-hidden="true"><span>Ptuj</span> <time data-clock>--:--</time></p>
   </header>
 
   <main>
 
-    <!-- HERO -->
+    <!-- UVOD -->
     <section class="hero t-dark" id="top" aria-label="Uvod">
       <div class="wrap hero__wrap">
         <p class="status"><span class="status__dot" aria-hidden="true"></span>Na voljo za delo</p>
-        <a class="cue" href="#delo">Odkrij več <i aria-hidden="true"></i></a>
-
-        <h1 class="name" aria-label="Jaka Štraser">
-          <span class="name__line" data-split>Jaka</span>
-          <span class="name__line" data-split>Štraser</span>
-        </h1>
-
-        <div class="hero__meta">
-          <p class="hero__intro">Full-stack razvijalec in študent smeri <strong>Informatika in tehnologije komuniciranja</strong> na FERI.</p>
-          <dl class="facts">
-            <div><dt>Kraj</dt><dd>Ptuj, Slovenija</dd></div>
-            <div><dt>Študij</dt><dd>FERI, Univerza v Mariboru</dd></div>
-            <div><dt>Iščem</dt><dd>Poletno in redno delo</dd></div>
-          </dl>
-        </div>
+        <h1 class="name">Jaka Štraser</h1>
+        <p class="hero__role">Full-stack razvijalec</p>
+        <p class="hero__intro">Študent smeri <strong>Informatika in tehnologije komuniciranja</strong> na FERI. Razvijam spletne in mobilne aplikacije, od podatkovne baze do uporabniškega vmesnika.</p>
+        <dl class="facts">
+          <div><dt>Kraj</dt><dd>Ptuj, Slovenija</dd></div>
+          <div><dt>Študij</dt><dd>FERI, Univerza v Mariboru</dd></div>
+          <div><dt>Iščem</dt><dd>Poletno in redno delo</dd></div>
+        </dl>
       </div>
     </section>
 
-    <!-- DELO: od baze do vmesnika, trije sloji se prižgejo z drsenjem -->
-    <section class="flow t-dark" id="delo" aria-labelledby="flow-h">
-      <div class="flow__stage wrap">
-        <p class="label">Kaj delam</p>
-        <h2 id="flow-h" class="flow__h">Od baze <em>do</em> vmesnika.</h2>
+    <!-- KAJ DELAM -->
+    <section class="skills t-dark" id="delo" aria-labelledby="skills-h">
+      <div class="wrap">
+        <header class="head">
+          <p class="label">Kaj delam</p>
+          <h2 id="skills-h" class="head__h">Razvoj celotne aplikacije</h2>
+        </header>
 
-        <ol class="flow__steps">
-          <li class="step">
-            <span class="step__node" aria-hidden="true"></span>
-            <h3>Baza</h3>
-            <p>Zanesljivi podatki in hitre poizvedbe.</p>
-            <ul class="chips"><li>MongoDB</li><li>SQL</li></ul>
-          </li>
-          <li class="step">
-            <span class="step__node" aria-hidden="true"></span>
-            <h3>Strežnik</h3>
-            <p>Logika, prijava uporabnikov in REST API-ji.</p>
-            <ul class="chips"><li>Node.js</li><li>Python</li><li>C++</li></ul>
-          </li>
-          <li class="step">
-            <span class="step__node" aria-hidden="true"></span>
-            <h3>Vmesnik</h3>
-            <p>Hitri in jasni spletni ter mobilni vmesniki.</p>
+        <ul class="skills__grid">
+          <li class="skill" data-reveal>
+            <h3>Uporabniški vmesnik</h3>
+            <p>Pregledni in odzivni spletni ter mobilni vmesniki.</p>
             <ul class="chips"><li>Angular</li><li>React</li><li>Flutter</li><li>Dart</li><li>JavaScript</li></ul>
           </li>
-        </ol>
+          <li class="skill" data-reveal>
+            <h3>Strežnik</h3>
+            <p>Poslovna logika, prijava uporabnikov in REST API-ji.</p>
+            <ul class="chips"><li>Node.js</li><li>Python</li><li>C++</li></ul>
+          </li>
+          <li class="skill" data-reveal>
+            <h3>Podatkovne baze</h3>
+            <p>Načrtovanje podatkov, zanesljivo shranjevanje in hitre poizvedbe.</p>
+            <ul class="chips"><li>MongoDB</li><li>SQL</li></ul>
+          </li>
+        </ul>
       </div>
     </section>
 
@@ -118,27 +97,35 @@
         </header>
 
         <ol class="work__list">
-          <li class="work__item" data-reveal tabindex="0">
-            <p class="work__kind">Lastni projekt</p>
-            <h3 class="work__title">TripPlaner</h3>
+          <li class="work__item" data-reveal>
+            <div class="work__main">
+              <p class="work__kind">Lastni projekt</p>
+              <h3 class="work__title">TripPlaner</h3>
+            </div>
             <p class="work__desc">Načrtovanje izletov v hribe: pot, parkiranje in mnenja drugih planincev na enem mestu.</p>
             <ul class="chips"><li>Full-stack</li><li>Planinske poti</li></ul>
           </li>
-          <li class="work__item" data-reveal tabindex="0">
-            <p class="work__kind">Spletna aplikacija</p>
-            <h3 class="work__title">BookWithStraser</h3>
+          <li class="work__item" data-reveal>
+            <div class="work__main">
+              <p class="work__kind">Spletna aplikacija</p>
+              <h3 class="work__title">BookWithStraser</h3>
+            </div>
             <p class="work__desc">Spletne rezervacije s prijavo, upravljanjem terminov in REST API-jem.</p>
             <ul class="chips"><li>Angular</li><li>Node.js</li><li>MongoDB</li></ul>
           </li>
-          <li class="work__item" data-reveal tabindex="0">
-            <p class="work__kind">Mobilna aplikacija</p>
-            <h3 class="work__title">Road Alert</h3>
+          <li class="work__item" data-reveal>
+            <div class="work__main">
+              <p class="work__kind">Mobilna aplikacija</p>
+              <h3 class="work__title">Road Alert</h3>
+            </div>
             <p class="work__desc">Promet v Sloveniji v realnem času: zastoji, dela na cesti in opozorila.</p>
             <ul class="chips"><li>Flutter</li><li>Dart</li><li>API</li></ul>
           </li>
-          <li class="work__item" data-reveal tabindex="0">
-            <p class="work__kind">Orodje</p>
-            <h3 class="work__title">metaCleaner</h3>
+          <li class="work__item" data-reveal>
+            <div class="work__main">
+              <p class="work__kind">Orodje</p>
+              <h3 class="work__title">metaCleaner</h3>
+            </div>
             <p class="work__desc">Odstrani metapodatke iz slik, da jih lahko zasebno deliš.</p>
             <ul class="chips"><li>C++</li><li>JavaScript</li></ul>
           </li>
@@ -151,7 +138,7 @@
       <div class="wrap path__wrap">
         <header class="path__side">
           <p class="label">Izobrazba in izkušnje</p>
-          <h2 id="pot-h" class="head__h">Pot <em>do sem.</em></h2>
+          <h2 id="pot-h" class="head__h">Pot do sem</h2>
         </header>
 
         <ol class="timeline">
@@ -189,34 +176,18 @@
 
     <!-- KONTAKT -->
     <section class="close t-dark" id="kontakt" aria-labelledby="kontakt-h">
-      <div class="wrap close__wrap">
-        <div>
-          <p class="label">Kontakt</p>
-          <h2 id="kontakt-h" class="close__h">Pogovorimo <em>se.</em></h2>
-        </div>
-
-        <div class="close__body">
-          <p class="close__lead">Iščem poletno in redno delo v regiji Ptuj / Maribor.</p>
-          <!-- ZAMENJAJ: vpiši svoj e-mail in povezave -->
-          <a class="close__mail" href="mailto:jaka@jastra.si?subject=Povpra%C5%A1evanje%20preko%20jastra.si&body=Pozdravljeni%2C%0D%0A%0D%0A"><span>jaka@jastra.si</span></a>
-          <p class="close__links">
-            <a class="btn btn--solid magnet" href="mailto:jaka@jastra.si?subject=Povpra%C5%A1evanje%20preko%20jastra.si&body=Pozdravljeni%2C%0D%0A%0D%0A"><span>Pišite mi</span></a>
-            <a class="btn btn--line magnet" href="https://github.com/straserjaka" target="_blank" rel="noopener"><span>GitHub</span></a>
-            <a class="btn btn--line magnet" href="https://www.linkedin.com/" target="_blank" rel="noopener"><span>LinkedIn</span></a>
-            <a class="btn btn--line magnet" href="CV.pdf" target="_blank" rel="noopener"><span>Prenesi CV</span></a>
-            <button class="btn btn--line magnet" type="button" data-copy="jaka@jastra.si"><span>Kopiraj e-mail</span></button>
-          </p>
-        </div>
-
+      <div class="wrap">
         <div class="contact">
           <div class="contact__side">
-            <p class="label">Sporočilo</p>
-            <h3 class="contact__h">Povejte, kaj imate <em>v mislih.</em></h3>
-            <p class="contact__note">Nekaj vrstic je dovolj. Odgovorim v enem do dveh delovnih dneh.</p>
+            <p class="label">Kontakt</p>
+            <h2 id="kontakt-h" class="head__h">Pogovorimo se</h2>
+            <p class="contact__note">Iščem poletno in redno delo v regiji Ptuj / Maribor. Napišite nekaj vrstic, odgovorim v enem do dveh delovnih dneh.</p>
             <ul class="contact__meta">
               <li><span>E-mail</span><a href="mailto:jaka@jastra.si">jaka@jastra.si</a></li>
+              <li><span>GitHub</span><a href="https://github.com/straserjaka" target="_blank" rel="noopener">straserjaka</a></li>
+              <li><span>LinkedIn</span><a href="https://www.linkedin.com/" target="_blank" rel="noopener">Profil</a></li>
+              <li><span>CV</span><a href="CV.pdf" target="_blank" rel="noopener">Prenesi PDF</a></li>
               <li><span>Lokacija</span>Ptuj, Slovenija</li>
-              <li><span>Status</span>Na voljo za delo</li>
             </ul>
           </div>
 
@@ -226,19 +197,19 @@
             <div class="form__fields">
               <div class="field">
                 <input id="cf-name" name="name" type="text" placeholder=" " required maxlength="100" autocomplete="name" aria-describedby="cf-name-err">
-                <label for="cf-name"><span class="field__no" aria-hidden="true">01</span>Ime</label>
+                <label for="cf-name">Ime</label>
                 <span class="field__ok" aria-hidden="true"></span>
                 <p class="field__err" id="cf-name-err" hidden></p>
               </div>
               <div class="field">
                 <input id="cf-email" name="email" type="email" placeholder=" " required maxlength="200" autocomplete="email" inputmode="email" aria-describedby="cf-email-err">
-                <label for="cf-email"><span class="field__no" aria-hidden="true">02</span>E-mail</label>
+                <label for="cf-email">E-mail</label>
                 <span class="field__ok" aria-hidden="true"></span>
                 <p class="field__err" id="cf-email-err" hidden></p>
               </div>
               <div class="field field--area">
                 <textarea id="cf-message" name="message" rows="5" placeholder=" " required maxlength="5000" aria-describedby="cf-message-err cf-count"></textarea>
-                <label for="cf-message"><span class="field__no" aria-hidden="true">03</span>Sporočilo</label>
+                <label for="cf-message">Sporočilo</label>
                 <span class="field__ok" aria-hidden="true"></span>
                 <p class="field__err" id="cf-message-err" hidden></p>
                 <span class="field__count" id="cf-count" data-count>0 / 5000</span>
@@ -249,7 +220,6 @@
                 <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off">
               </div>
 
-              <!-- ZAMENJAJ: TURNSTILE_SITE_KEY z javnim Site Key iz Cloudflare Turnstile -->
               <div class="form__human">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAAFmqaiTGI-GW4Cga" data-theme="dark" data-error-callback="onTurnstileError"></div>
                 <p class="form__hint">Zaščiteno s Cloudflare Turnstile.</p>

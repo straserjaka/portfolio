@@ -1,7 +1,7 @@
 /* ==========================================================
    Jaka Štraser, portfolio
-   Črna in bela. Geist za glas in branje, mono za oznake,
-   en sam serifni poudarek. Ozadje je interaktivno (canvas).
+   Črna in bela, Geist za besedilo, mono za oznake.
+   Umirjena tipografija, brez dekorativnih učinkov.
    ========================================================== */
 
 :root {
@@ -10,13 +10,13 @@
 
   --s1: .25rem; --s2: .5rem;  --s3: .75rem; --s4: 1rem;
   --s5: 1.5rem; --s6: 2rem;   --s7: 3rem;   --s8: 4rem;
-  --s9: 6rem;   --s10: 8rem;
-  --gutter: clamp(1.25rem, 5vw, 5rem);
-  --max: 90rem;
+  --s9: 6rem;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --max: 72rem;
+  --section: clamp(4rem, 8vw, 7rem);
 
   --sans:  "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:  "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
-  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --ease:  cubic-bezier(.22, 1, .36, 1);
 }
 
@@ -42,13 +42,12 @@ html {
   color-scheme: dark;
   scrollbar-color: #3a3a3a var(--black);
   background: var(--black);
-  scroll-padding-top: 5rem;
+  scroll-padding-top: 4.5rem;
 }
-html.loading { overflow: hidden; }
 
 body {
   font-family: var(--sans);
-  font-size: 1.0625rem;
+  font-size: 1rem;
   line-height: 1.6;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
@@ -62,17 +61,12 @@ a { color: inherit; text-decoration: none; }
 p { text-wrap: pretty; }
 h1, h2, h3 { text-wrap: balance; font-weight: 500; }
 ol, ul { list-style: none; }
-em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; }
 
 ::selection { background: var(--white); color: var(--black); }
 :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 
 .wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
 
-.sr {
-  position: absolute; width: 1px; height: 1px; overflow: hidden;
-  clip-path: inset(50%); white-space: nowrap;
-}
 .skip {
   position: fixed; top: var(--s3); left: var(--s3); z-index: 300;
   padding: var(--s3) var(--s4); background: var(--white); color: var(--black); font-weight: 500;
@@ -80,353 +74,173 @@ em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spa
 }
 .skip:focus-visible { transform: none; }
 
-.label, .status, .chips li, .work__kind, .timeline__when, .facts dt, .clock, .loader__count, .close__foot {
+.label, .status, .chips li, .work__kind, .timeline__when, .facts dt, .close__foot {
   font-family: var(--mono);
   font-size: .75rem;
   font-weight: 500;
-  letter-spacing: .1em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
-.label { color: var(--dim); margin-bottom: var(--s5); }
+.label { color: var(--dim); margin-bottom: var(--s4); }
 
-/* Interaktivno ozadje: konturne črte za vsebino, vidne samo na temnih razdelkih */
+/* Ozadje: konturne črte za vsebino, vidne samo na temnih razdelkih */
 .bg {
   position: fixed; inset: 0; z-index: 0;
   width: 100%; height: 100%;
   pointer-events: none;
 }
-/* Vsebina je nad ozadjem; pike so vidne samo na temnih razdelkih (svetli so polni) */
 main { position: relative; z-index: 1; }
 
 /* ==========================================================
-   NALAGANJE
+   NAVIGACIJA
    ========================================================== */
-.loader { display: none; }
-.js.motion .loader {
-  position: fixed; inset: 0; z-index: 200;
-  display: grid; place-items: center;
-  background: var(--black); color: var(--white);
-  transition: transform 1000ms cubic-bezier(.76, 0, .24, 1);
-}
-.loader.is-done { transform: translateY(-100%); pointer-events: none; }
-.loader.is-gone { display: none !important; }
-
-.loader__inner { width: min(22rem, 70vw); }
-.loader__name {
-  font-size: clamp(1.25rem, 3vw, 1.6rem);
-  font-weight: 500; letter-spacing: -.02em;
-  opacity: 0; transform: translateY(.6rem);
-  animation: up 800ms var(--ease) 150ms forwards;
-}
-.loader__row { display: flex; align-items: center; gap: var(--s4); margin-top: var(--s4); }
-.loader__line { position: relative; flex: 1; height: 1px; background: rgba(255, 255, 255, .18); overflow: hidden; }
-.loader__line i {
-  position: absolute; inset: 0; background: var(--white);
-  transform: scaleX(var(--load, 0)); transform-origin: left;
-}
-.loader__count { color: var(--dim); font-variant-numeric: tabular-nums; }
-@keyframes up { to { opacity: 1; transform: none; } }
-
-/* ==========================================================
-   NAVIGACIJA (temna steklena vrstica: tekst se nikoli ne prekriva)
-   ========================================================== */
-.progress {
-  position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 90;
-  background: var(--white);
-  transform: scaleX(var(--prog, 0)); transform-origin: left; pointer-events: none;
-}
-
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: 80;
   display: flex; align-items: center; justify-content: space-between; gap: var(--s5);
-  padding: var(--s4) var(--gutter);
+  padding: var(--s3) var(--gutter);
   color: var(--white);
-  background: rgba(10, 10, 10, .78); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  background: rgba(10, 10, 10, .85); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, .1);
 }
 
 .logo { display: inline-flex; align-items: center; gap: var(--s3); min-height: 44px; font-weight: 500; letter-spacing: -.01em; }
-.logo__dot { width: .65rem; height: .65rem; border-radius: 50%; background: currentColor; transition: transform 500ms var(--ease); }
+.logo__dot { width: .55rem; height: .55rem; border-radius: 50%; background: currentColor; }
 
 .menu { display: flex; gap: var(--s1); margin-left: auto; }
 .menu a {
   position: relative; display: inline-flex; align-items: center;
   min-height: 44px; padding: 0 var(--s3); font-size: .875rem; font-weight: 450;
+  color: var(--soft); transition: color 250ms;
 }
-.menu a::after {
-  content: ""; position: absolute; left: var(--s3); right: var(--s3); bottom: .6rem; height: 1px;
-  background: currentColor; transform: scaleX(0); transform-origin: right;
-  transition: transform 450ms var(--ease);
-}
-.menu a[aria-current="true"]::after { transform: scaleX(1); transform-origin: left; }
-.clock { display: flex; gap: var(--s2); min-width: 6rem; justify-content: flex-end; font-variant-numeric: tabular-nums; }
+.menu a[aria-current="true"] { color: var(--white); }
 
 /* ==========================================================
    GUMBI IN ZNAČKE
    ========================================================== */
 .btn {
-  position: relative; overflow: hidden; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center;
-  min-height: 52px; padding: 0 1.7rem;
-  border-radius: 999px; border: 1px solid var(--ink);
-  font-size: .9375rem; font-weight: 500;
-  transition: color 450ms var(--ease), transform 300ms var(--ease);
+  min-height: 48px; padding: 0 1.5rem;
+  border-radius: 6px; border: 1px solid var(--ink);
+  font-size: .9375rem; font-weight: 500; cursor: pointer;
+  transition: background 250ms, color 250ms, border-color 250ms;
 }
-.btn::before {
-  content: ""; position: absolute; inset: -1px; z-index: -1; border-radius: inherit;
-  transform: translateY(101%); transition: transform 550ms var(--ease);
-}
-.btn span { position: relative; }
 .btn--solid { background: var(--ink); color: var(--bg); }
-.btn--solid::before { background: var(--bg); }
-.btn--line { border-color: var(--rule); color: var(--ink); }
-.btn--line::before { background: var(--ink); }
+.btn--line { background: transparent; border-color: var(--rule); color: var(--ink); }
 
 .chips { display: flex; flex-wrap: wrap; gap: var(--s2); }
 .chips li {
-  padding: .45rem .85rem; border: 1px solid var(--rule); border-radius: 999px;
-  color: var(--soft); letter-spacing: .08em;
+  padding: .3rem .65rem; border: 1px solid var(--rule); border-radius: 4px;
+  color: var(--soft); letter-spacing: .06em;
 }
 
 /* ==========================================================
-   HERO
+   NASLOVI RAZDELKOV
    ========================================================== */
-.hero { position: relative; min-height: 100vh; min-height: 100svh; display: flex; background: transparent; }
+.head { margin-bottom: var(--s7); }
+.head__h { font-size: clamp(1.9rem, 3.6vw, 2.75rem); letter-spacing: -.03em; line-height: 1.1; }
+
+/* ==========================================================
+   UVOD
+   ========================================================== */
+.hero { position: relative; min-height: 88vh; min-height: 88svh; display: flex; background: transparent; }
 .hero__wrap {
-  display: flex; flex-direction: column; justify-content: flex-end; gap: var(--s6);
-  padding-top: 7rem; padding-bottom: var(--s7);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+  padding-top: 7rem; padding-bottom: var(--s8);
 }
-.status { display: inline-flex; align-items: center; gap: var(--s3); color: var(--soft); }
-.status__dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--white); }
+.status { display: inline-flex; align-items: center; gap: var(--s3); color: var(--soft); margin-bottom: var(--s5); }
+.status__dot { width: .5rem; height: .5rem; border-radius: 50%; background: #4ade80; }
 
-.name { line-height: .86; }
-.name__line {
-  display: block;
-  font-size: clamp(4.5rem, min(21vw, 26vh), 25rem);
-  font-weight: 500;
-  letter-spacing: -.06em;
-  line-height: 1;
-  white-space: nowrap;
-}
-.ch { display: inline-block; will-change: transform, opacity; }
+.name { font-size: clamp(2.75rem, 7vw, 5.5rem); letter-spacing: -.04em; line-height: 1.02; }
+.hero__role { margin-top: var(--s3); font-size: clamp(1.15rem, 2vw, 1.5rem); color: var(--soft); }
+.hero__intro { margin-top: var(--s5); max-width: 38rem; color: var(--soft); }
+.hero__intro strong { font-weight: 500; color: var(--white); }
 
-/* Povabilo k odkrivanju */
-.hero__wrap { position: relative; }
-.cue {
-  position: absolute; top: 7rem; right: var(--gutter);
-  display: inline-flex; align-items: center; gap: var(--s3); min-height: 44px;
-  font-family: var(--mono); font-size: .75rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--soft);
+.facts {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s5);
+  width: 100%; max-width: 44rem; margin-top: var(--s7); padding-top: var(--s5); border-top: 1px solid var(--rule);
 }
-.cue i { position: relative; width: 1px; height: 2.5rem; background: var(--rule); overflow: hidden; }
-.cue i::after {
-  content: ""; position: absolute; left: 0; top: 0; width: 1px; height: 40%; background: var(--white);
-  animation: cue 2s var(--ease) infinite;
-}
-@keyframes cue { from { transform: translateY(-100%); } to { transform: translateY(260%); } }
-
-.hero__meta {
-  display: grid; grid-template-columns: minmax(0, 26rem) minmax(0, 1fr); gap: var(--s7);
-  align-items: end; padding-top: var(--s6); border-top: 1px solid var(--rule);
-}
-.hero__intro { font-size: 1.1875rem; line-height: 1.5; color: var(--soft); }
-.hero__intro strong { font-weight: 500; color: #fff; }
-.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s5); }
-.facts dt { color: var(--dim); margin-bottom: var(--s2); }
+.facts dt { color: var(--dim); margin-bottom: var(--s1); }
 .facts dd { font-size: .9375rem; line-height: 1.4; }
 
 /* ==========================================================
-   DELO: tri sloji
+   KAJ DELAM
    ========================================================== */
-.flow { background: transparent; }
-.flow__stage { padding-block: clamp(5rem, 10vw, 9rem); }
-.flow__h {
-  font-size: clamp(2.8rem, min(8.4vw, 13vh), 8rem);
-  letter-spacing: -.055em; line-height: .95;
-  margin-bottom: var(--s9);
-}
-.flow__h em { font-size: 1.08em; }
-
-.flow__steps {
-  position: relative;
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s6);
-  padding-top: var(--s7);
-  --fp: 1;
-}
-.flow__steps::before, .flow__steps::after {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
-}
-.flow__steps::before { background: var(--rule); }
-.flow__steps::after  { background: var(--ink); transform: scaleX(var(--fp)); transform-origin: left; }
-
-.step { position: relative; display: grid; gap: var(--s4); align-content: start; }
-.step__node {
-  position: absolute; top: calc(var(--s7) * -1 - 6px); left: 0;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--black); border: 1px solid var(--dim);
-  transition: background 500ms var(--ease), border-color 500ms var(--ease), transform 500ms var(--ease);
-}
-.step h3 { font-size: clamp(1.9rem, 3.4vw, 3rem); letter-spacing: -.045em; line-height: 1; }
-.step p { max-width: 22rem; color: var(--soft); }
-
-.motion .step { opacity: .3; transition: opacity 600ms var(--ease); }
-.motion .step.on { opacity: 1; }
-.motion .step.on .step__node { background: var(--white); border-color: var(--white); transform: scale(1.35); }
-
-@media (min-width: 801px) {
-  .motion .flow { height: 220vh; }
-  .motion .flow__stage {
-    position: sticky; top: 0; height: 100vh; height: 100svh;
-    display: flex; flex-direction: column; justify-content: center;
-    padding-block: var(--s8);
-  }
-  .motion .flow__h { margin-bottom: var(--s8); }
-}
+.skills { padding-block: var(--section); border-top: 1px solid rgba(255, 255, 255, .1); }
+.skills__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s6); }
+.skill { display: flex; flex-direction: column; gap: var(--s3); padding-top: var(--s5); border-top: 1px solid var(--rule); }
+.skill h3 { font-size: 1.25rem; letter-spacing: -.015em; line-height: 1.25; }
+.skill p { color: var(--soft); }
+.skill .chips { margin-top: auto; padding-top: var(--s3); }
 
 /* ==========================================================
    PROJEKTI (bela)
    ========================================================== */
-.work { padding-block: clamp(5rem, 10vw, 9rem); }
-.head { margin-bottom: var(--s8); }
-.head__h { font-size: clamp(3rem, 9vw, 9rem); letter-spacing: -.06em; line-height: .9; }
-.head__h em { font-size: 1.08em; }
-
+.work { padding-block: var(--section); }
 .work__list { border-top: 1px solid var(--rule); }
 .work__item {
-  position: relative;
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: var(--s7); row-gap: var(--s4);
-  padding: clamp(1.75rem, 3.6vw, 3rem) 0;
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 5fr) minmax(0, 4fr);
+  column-gap: var(--s6); row-gap: var(--s3); align-items: start;
+  padding: var(--s6) 0;
   border-bottom: 1px solid var(--rule);
-  outline-offset: -2px;
-  transition: opacity 500ms var(--ease);
 }
-.work__kind { grid-column: 1 / -1; color: var(--dim); }
-.work__title {
-  grid-column: 1 / -1;
-  font-size: clamp(2.6rem, 8.6vw, 8.5rem);
-  letter-spacing: -.06em; line-height: .96; padding-bottom: .04em;
-  text-wrap: nowrap;
-  transition: transform 700ms var(--ease);
-}
-.work__desc { grid-column: 1; max-width: 32rem; color: var(--soft); font-size: 1.0625rem; }
-.work__item .chips { grid-column: 2; justify-content: flex-end; align-self: end; }
-
-.work__item::after {                  /* črta, ki se razprostre ob fokusu */
-  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
-  background: var(--ink); transform: scaleX(0); transform-origin: left;
-  transition: transform 800ms var(--ease);
-}
-
-/* Zaporedne številke projektov */
-.work__list { counter-reset: proj; }
-.work__item { counter-increment: proj; }
-.work__kind::before {
-  content: "0" counter(proj) "  /  "; color: var(--ink); white-space: pre;
-}
+.work__kind { color: var(--dim); margin-bottom: var(--s1); }
+.work__title { font-size: clamp(1.4rem, 2.4vw, 1.75rem); letter-spacing: -.025em; line-height: 1.2; }
+.work__desc { color: var(--soft); }
+.work__item .chips { justify-content: flex-end; }
 
 /* ==========================================================
    POT (črna)
    ========================================================== */
-.path { padding-block: clamp(5rem, 10vw, 9rem); }
-.path__wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s7); }
-.path__side { align-self: start; position: sticky; top: var(--s9); }
+.path { padding-block: var(--section); border-top: 1px solid rgba(255, 255, 255, .1); }
+.path__wrap { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); column-gap: var(--s7); }
+.path__side { align-self: start; position: sticky; top: 6rem; }
 
-.timeline { position: relative; padding-left: var(--s7); }
-.timeline::before, .timeline::after {
-  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
-}
-.timeline::before { background: var(--rule); }
-.timeline::after  { background: var(--ink); transform: scaleY(var(--tp, 1)); transform-origin: top; }
+.timeline { border-top: 1px solid var(--rule); }
 .timeline li {
-  position: relative;
-  display: grid; grid-template-columns: 8rem 1fr; gap: var(--s5);
-  padding: var(--s6) 0 var(--s7);
+  display: grid; grid-template-columns: 9rem 1fr; gap: var(--s5);
+  padding: var(--s5) 0;
   border-bottom: 1px solid var(--rule);
 }
-.timeline li:first-child { padding-top: 0; }
-.timeline li::before {
-  content: ""; position: absolute; left: calc(var(--s7) * -1 - 4px); top: .55rem;
-  width: 9px; height: 9px; border-radius: 50%; background: var(--black); border: 1px solid var(--dim);
-  transition: background 500ms var(--ease), border-color 500ms var(--ease);
-}
-.timeline li:not(:first-child)::before { top: calc(var(--s6) + .55rem); }
-.timeline li.in::before { background: var(--white); border-color: var(--white); }
-.timeline__when { color: var(--dim); padding-top: .4rem; }
-.timeline li:not(:first-child) .timeline__when { padding-top: calc(var(--s6) + .4rem); }
-.timeline h3 { font-size: clamp(1.5rem, 2.8vw, 2.4rem); letter-spacing: -.04em; line-height: 1.1; }
-.timeline p { margin-top: var(--s2); color: var(--soft); }
-.timeline li:not(:first-child) > div { padding-top: var(--s6); }
+.timeline__when { color: var(--dim); padding-top: .3rem; }
+.timeline h3 { font-size: 1.25rem; letter-spacing: -.015em; line-height: 1.3; }
+.timeline p { margin-top: var(--s1); color: var(--soft); }
 
 /* ==========================================================
-   KONTAKT (bela)
+   KONTAKT (črna)
    ========================================================== */
-.close { padding-top: clamp(5rem, 10vw, 9rem); }
-.close__wrap {
-  min-height: calc(100svh - clamp(5rem, 10vw, 9rem));
-  display: flex; flex-direction: column; justify-content: space-between; gap: var(--s8);
-  padding-bottom: var(--s5);
-}
-.close__h {
-  font-size: clamp(3.4rem, 14vw, 15rem);
-  letter-spacing: -.065em; line-height: .88;
-}
-.close__h em { font-size: 1.06em; }
-.close__body { display: grid; gap: var(--s6); justify-items: start; }
-.close__lead { max-width: 30rem; font-size: 1.25rem; color: var(--soft); }
-.close__mail {
-  position: relative; display: inline-block; max-width: 100%;
-  font-size: clamp(1.7rem, 5.6vw, 5.5rem);
-  letter-spacing: -.05em; line-height: 1.1; font-weight: 450;
-  padding-bottom: .1em; overflow-wrap: anywhere;
-}
-.close__mail::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: currentColor;
-  transform-origin: left; transition: transform 700ms var(--ease);
-}
-.close__links { display: flex; flex-wrap: wrap; gap: var(--s3); }
+.close { padding-top: var(--section); border-top: 1px solid rgba(255, 255, 255, .1); }
 .close__foot {
   display: flex; justify-content: space-between; gap: var(--s4);
-  padding-top: var(--s4); border-top: 1px solid var(--rule); color: var(--dim);
+  margin-top: var(--s8); padding-block: var(--s5);
+  border-top: 1px solid var(--rule); color: var(--dim);
 }
-.close__foot a { transition: color 300ms; }
+.close__foot a { transition: color 250ms; }
 
-/* ==========================================================
-   OBRAZEC
-   Mirna plošča nad ozadjem, plavajoče oznake, vrstična validacija.
-   ========================================================== */
 .contact {
-  position: relative; z-index: 60;
   display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--s8);
-  padding-block: var(--s8);
-  background: var(--black);
-  box-shadow: 0 0 0 100vmax var(--black);
-  clip-path: inset(0 -100vmax);
-  border-top: 1px solid var(--rule);
   color-scheme: dark;
 }
-.contact .label { margin-bottom: var(--s4); }
 .contact__side { align-self: start; position: sticky; top: 6rem; }
-.contact__h { font-size: clamp(2rem, 3.8vw, 3.4rem); letter-spacing: -.05em; line-height: 1; }
-.contact__h em { font-size: 1.08em; }
-.contact__note { margin-top: var(--s4); max-width: 24rem; color: var(--soft); }
-.contact__meta { margin-top: var(--s6); max-width: 24rem; border-top: 1px solid var(--rule); }
+.contact__note { margin-top: var(--s4); max-width: 26rem; color: var(--soft); }
+.contact__meta { margin-top: var(--s6); max-width: 26rem; border-top: 1px solid var(--rule); }
 .contact__meta li {
   display: flex; justify-content: space-between; gap: var(--s4);
   padding: var(--s3) 0; border-bottom: 1px solid var(--rule); font-size: .9375rem;
 }
 .contact__meta span {
   font-family: var(--mono); font-size: .75rem; font-weight: 500;
-  letter-spacing: .1em; text-transform: uppercase; color: var(--dim); padding-top: .15rem;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--dim); padding-top: .15rem;
 }
-.contact__meta a { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: .25em; transition: text-decoration-color 300ms; }
-.contact__meta a:hover { text-decoration-color: currentColor; }
+.contact__meta a { text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: .25em; transition: text-decoration-color 250ms; }
 
-.form { position: relative; display: grid; gap: var(--s6); max-width: 42rem; width: 100%; }
+/* ==========================================================
+   OBRAZEC
+   ========================================================== */
+.form { position: relative; display: grid; gap: var(--s6); max-width: 38rem; width: 100%; }
 .form__progress { height: 1px; background: var(--rule); }
 .form__progress i {
   display: block; height: 100%; background: var(--white);
-  transform: scaleX(var(--fill, 0)); transform-origin: left; transition: transform 600ms var(--ease);
+  transform: scaleX(var(--fill, 0)); transform-origin: left; transition: transform 500ms var(--ease);
 }
 .form__fields { display: grid; gap: var(--s5); }
 
@@ -436,9 +250,9 @@ main { position: relative; z-index: 1; }
   display: block; width: 100%; padding: .9rem 2.25rem .7rem 0;
   background: transparent; color: var(--ink);
   border: 0; border-bottom: 1px solid var(--rule); border-radius: 0;
-  font: inherit; font-size: 1.1875rem; line-height: 1.5;
+  font: inherit; font-size: 1.0625rem; line-height: 1.5;
   caret-color: var(--white);
-  transition: border-color 300ms var(--ease);
+  transition: border-color 250ms var(--ease);
 }
 .field textarea { min-height: 9rem; resize: vertical; padding-bottom: 1.6rem; }
 .field input:focus, .field textarea:focus { outline: none; border-bottom-color: var(--ink); }
@@ -446,40 +260,30 @@ main { position: relative; z-index: 1; }
 
 .field label {
   position: absolute; left: 0; top: 1.95rem; display: flex; align-items: baseline; gap: var(--s3);
-  font-size: 1.1875rem; color: var(--dim); pointer-events: none; transform-origin: left top;
-  transition: transform 350ms var(--ease), color 300ms var(--ease);
+  font-size: 1.0625rem; color: var(--dim); pointer-events: none; transform-origin: left top;
+  transition: transform 300ms var(--ease), color 250ms var(--ease);
 }
-.field__no { font-family: var(--mono); font-size: .6875rem; letter-spacing: .1em; }
 .field input:focus ~ label, .field input:not(:placeholder-shown) ~ label,
 .field textarea:focus ~ label, .field textarea:not(:placeholder-shown) ~ label {
-  transform: translateY(-1.6rem) scale(.68); color: var(--soft);
+  transform: translateY(-1.6rem) scale(.78); color: var(--soft);
 }
 .field input:focus ~ label, .field textarea:focus ~ label { color: var(--ink); }
-
-.field::after {                       /* črta, ki se razprostre ob fokusu */
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: var(--ink); transform: scaleX(0); transform-origin: left;
-  transition: transform 600ms var(--ease); pointer-events: none;
-}
-.field:focus-within::after { transform: scaleX(1); }
 
 /* Veljavno polje: kljukica */
 .field__ok {
   position: absolute; right: 0; top: 1.95rem; width: 1.1rem; height: 1.1rem; opacity: 0;
-  transform: scale(.6); transition: opacity 300ms var(--ease), transform 400ms var(--ease);
+  transition: opacity 250ms var(--ease);
 }
 .field__ok::before {
   content: ""; position: absolute; left: .3rem; top: .05rem; width: .35rem; height: .7rem;
   border: solid var(--white); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg);
 }
-.field.is-valid .field__ok { opacity: 1; transform: none; }
-.field--area .field__ok { top: 1.95rem; }
+.field.is-valid .field__ok { opacity: 1; }
 
 /* Napaka */
 .field__err { margin-top: var(--s2); font-size: .875rem; color: var(--ink); }
 .field__err::before { content: "× "; font-family: var(--mono); }
 .field.is-invalid input, .field.is-invalid textarea { border-bottom-color: var(--ink); border-bottom-style: dashed; }
-.field.is-invalid::after { transform: scaleX(1); }
 
 .field__count {
   position: absolute; right: 0; bottom: .45rem;
@@ -493,14 +297,12 @@ main { position: relative; z-index: 1; }
 
 .form__human { display: grid; gap: var(--s2); justify-items: start; }
 .cf-turnstile { min-height: 65px; }
-.form__hint { font-family: var(--mono); font-size: .6875rem; letter-spacing: .08em; color: var(--dim); }
+.form__hint { font-family: var(--mono); font-size: .6875rem; letter-spacing: .06em; color: var(--dim); }
 
 .form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s5); }
-.form__submit { gap: var(--s3); min-width: 11rem; }
-.form__arrow { position: relative; transition: transform 400ms var(--ease); }
-.form__tip { font-family: var(--mono); font-size: .6875rem; letter-spacing: .08em; color: var(--dim); }
+.form__submit { gap: var(--s3); min-width: 10rem; }
+.form__tip { font-family: var(--mono); font-size: .6875rem; letter-spacing: .06em; color: var(--dim); }
 .btn[disabled] { opacity: .55; cursor: progress; }
-.btn[disabled]::before { display: none; }
 
 .form__status { min-height: 1.6em; font-size: .9375rem; color: var(--soft); }
 .form__status.is-ok, .form__status.is-err { color: var(--ink); }
@@ -509,111 +311,59 @@ main { position: relative; z-index: 1; }
 
 /* Uspešno poslano */
 .form__done {
-  display: grid; justify-items: start; gap: var(--s5); padding: var(--s7) 0 var(--s4);
+  display: grid; justify-items: start; gap: var(--s5); padding: var(--s6) 0 var(--s4);
   border-top: 1px solid var(--rule);
 }
 .form__done[hidden] { display: none; }
 .form__done:focus { outline: none; }
-.form__check circle, .form__check path { stroke-dasharray: 140; stroke-dashoffset: 140; animation: draw 900ms var(--ease) forwards; }
-.form__check path { animation-delay: 300ms; }
+.form__check circle, .form__check path { stroke-dasharray: 140; stroke-dashoffset: 140; animation: draw 800ms var(--ease) forwards; }
+.form__check path { animation-delay: 250ms; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 .form.is-sent .form__progress, .form.is-sent .form__fields, .form.is-sent .form__actions { display: none; }
-.form.is-sent .form__status { font-size: 1.5rem; letter-spacing: -.03em; color: var(--ink); order: -1; }
+.form.is-sent .form__status { font-size: 1.25rem; letter-spacing: -.02em; color: var(--ink); order: -1; }
 .form.is-sent .form__status::before { content: none; }
 
 /* ==========================================================
    Interakcije (fina miška)
    ========================================================== */
 @media (hover: hover) and (pointer: fine) {
-  .menu a:hover::after { transform: scaleX(1); transform-origin: left; }
-  .logo:hover .logo__dot { transform: scale(1.5); }
-
-  .btn:hover::before { transform: translateY(0); }
-  .btn--solid:hover { color: var(--ink); }
-  .btn--line:hover { color: var(--bg); border-color: var(--ink); }
-  .form__submit:hover .form__arrow { transform: translateX(4px); }
+  .menu a:hover { color: var(--white); }
+  .btn--solid:hover { background: transparent; color: var(--ink); }
+  .btn--line:hover { border-color: var(--ink); }
   .field:hover input, .field:hover textarea { border-bottom-color: var(--soft); }
-
-  .work__list:hover .work__item { opacity: .3; }
-  .work__list:hover .work__item:hover { opacity: 1; }
-  .work__item:hover .work__title { transform: translateX(.9rem); }
-  .work__item:hover::after { transform: scaleX(1); }
-
-  .close__mail:hover::after { transform: scaleX(0); transform-origin: right; }
+  .contact__meta a:hover { text-decoration-color: currentColor; }
   .close__foot a:hover { color: var(--ink); }
 }
-.work__item:focus-visible .work__title { transform: translateX(.9rem); }
-.work__item:focus-visible::after { transform: scaleX(1); }
 
 /* ==========================================================
-   Vstopne animacije (samo z JS in dovoljenim gibanjem)
+   Pojavljanje ob drsenju (samo z JS in dovoljenim gibanjem)
    ========================================================== */
-.motion .ch, .motion .status, .motion .hero__meta, .motion .nav { opacity: 0; }
-.motion .ch { transform: translateY(.4em); }
-.motion.ready .ch {
-  animation: rise 1100ms var(--ease) forwards;
-  animation-delay: calc(var(--i, 0) * 50ms + 100ms);
-}
-.motion.ready .status { animation: fade 900ms var(--ease) 500ms forwards; }
-.motion.ready .hero__meta { animation: rise 1000ms var(--ease) 800ms forwards; transform: translateY(1rem); }
-.motion.ready .nav { animation: fade 900ms var(--ease) 600ms forwards; }
-.motion.ready .status__dot { animation: pulse 2.4s ease-out 1.4s infinite; }
-@keyframes rise { to { opacity: 1; transform: none; } }
-@keyframes fade { to { opacity: 1; } }
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, .5); }
-  70%, 100% { box-shadow: 0 0 0 .6rem rgba(255, 255, 255, 0); }
-}
-
 .motion [data-reveal] {
-  opacity: 0; transform: translateY(1.5rem);
-  transition: opacity 800ms var(--ease), transform 800ms var(--ease);
+  opacity: 0; transform: translateY(.75rem);
+  transition: opacity 600ms var(--ease), transform 600ms var(--ease);
 }
 .motion [data-reveal].in { opacity: 1; transform: none; }
-.motion .work__item[data-reveal].in { transition: opacity 500ms var(--ease), transform 800ms var(--ease); }
 
 /* ==========================================================
    Odzivnost
    ========================================================== */
 @media (max-width: 900px) {
-  .hero__meta { grid-template-columns: 1fr; gap: var(--s5); }
+  .skills__grid { grid-template-columns: 1fr; gap: var(--s5); }
+  .work__item { grid-template-columns: 1fr; }
+  .work__item .chips { justify-content: flex-start; margin-top: var(--s2); }
   .path__wrap { grid-template-columns: 1fr; }
-  .path__side { position: static; margin-bottom: var(--s7); }
-  .contact { grid-template-columns: 1fr; row-gap: var(--s7); padding-block: var(--s7); }
+  .path__side { position: static; margin-bottom: var(--s6); }
+  .contact { grid-template-columns: 1fr; row-gap: var(--s7); }
   .contact__side { position: static; }
-  .clock { display: none; }
-  .cue { display: none; }
-}
-
-@media (max-width: 800px) {
-  .flow__steps { grid-template-columns: 1fr; gap: var(--s7); padding-top: 0; }
-  .flow__steps::before, .flow__steps::after, .step__node { display: none; }
-  .motion .step { opacity: 1; }
-  .step { padding-top: var(--s5); border-top: 1px solid var(--rule); }
-  .flow__h { margin-bottom: var(--s7); }
 }
 
 @media (max-width: 700px) {
-  body { font-size: 1rem; }
   .logo__txt { display: none; }
   .menu { margin-left: 0; }
   .menu a { padding: 0 var(--s2); }
   .hero__wrap { padding-top: 6rem; }
-  .name__line { font-size: clamp(4rem, min(24vw, 24vh), 10rem); }
   .facts { grid-template-columns: 1fr; gap: var(--s4); }
-
-  .work__item { grid-template-columns: 1fr; }
-  .work__desc, .work__item .chips { grid-column: 1; }
-  .work__item .chips { justify-content: flex-start; align-self: start; }
-  .work__title { font-size: clamp(2.1rem, 10.5vw, 5rem); text-wrap: balance; white-space: normal; overflow-wrap: anywhere; }
-
-  .timeline { padding-left: var(--s6); }
-  .timeline li::before { left: calc(var(--s6) * -1 - 4px); }
-  .timeline li { grid-template-columns: 1fr; gap: var(--s2); }
-  .timeline li:not(:first-child) .timeline__when { padding-top: calc(var(--s6) + .4rem); }
-  .timeline li:not(:first-child) > div { padding-top: 0; }
-
-  .close__links .btn { flex: 1 1 auto; }
+  .timeline li { grid-template-columns: 1fr; gap: var(--s1); }
   .field input, .field textarea { font-size: 1rem; }   /* ≥16px, da iOS ne povečuje strani */
   .form__actions .btn { width: 100%; }
   .close__foot { flex-wrap: wrap; }
