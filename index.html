@@ -27,14 +27,15 @@
 <body>
   <a class="skip" href="#delo">Preskoči na vsebino</a>
 
-  <!-- NALAGANJE: ime, črta, števec. Nato se zavesa dvigne. -->
+  <!-- NALAGANJE: logotip se nariše sam (J), nato se zavesa dvigne. -->
   <div class="loader" aria-hidden="true">
     <div class="loader__inner">
+      <svg class="loader__mark" viewBox="0 0 32 32" fill="none">
+        <rect class="ld-frame" x="1" y="1" width="30" height="30" rx="8" pathLength="1"/>
+        <path class="ld-j" d="M18 8v10.5a4.5 4.5 0 0 1-4.5 4.5H12" pathLength="1"/>
+        <circle class="ld-dot" cx="22.5" cy="22.5" r="1.9"/>
+      </svg>
       <p class="loader__name">Jaka Štraser</p>
-      <div class="loader__row">
-        <span class="loader__line"><i></i></span>
-        <span class="loader__count">000</span>
-      </div>
     </div>
   </div>
 

@@ -111,20 +111,21 @@ main { position: relative; z-index: 1; }
 .loader.is-done { transform: translateY(-100%); pointer-events: none; }
 .loader.is-gone { display: none !important; }
 
-.loader__inner { width: min(22rem, 70vw); }
+.loader__inner { display: grid; justify-items: center; gap: var(--s5); }
+.loader__mark { width: clamp(4.5rem, 12vw, 6.5rem); height: auto; overflow: visible; }
+.loader__mark rect, .loader__mark path {
+  stroke: var(--white); stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1;
+}
+.loader__mark rect { stroke-width: 1; opacity: .55; animation: draw 800ms cubic-bezier(.65, 0, .35, 1) 100ms forwards; }
+.loader__mark path { stroke-width: 2.2; animation: draw 950ms cubic-bezier(.5, 0, .2, 1) 550ms forwards; }
+.loader__mark circle { fill: var(--white); transform-box: fill-box; transform-origin: center; transform: scale(0); animation: pop 400ms var(--ease) 1400ms forwards; }
 .loader__name {
-  font-size: clamp(1.25rem, 3vw, 1.6rem);
-  font-weight: 500; letter-spacing: -.02em;
-  opacity: 0; transform: translateY(.6rem);
-  animation: up 800ms var(--ease) 150ms forwards;
+  font-size: .9375rem; font-weight: 500; letter-spacing: .02em; color: var(--soft);
+  opacity: 0; transform: translateY(.5rem);
+  animation: up 700ms var(--ease) 1200ms forwards;
 }
-.loader__row { display: flex; align-items: center; gap: var(--s4); margin-top: var(--s4); }
-.loader__line { position: relative; flex: 1; height: 1px; background: rgba(255, 255, 255, .18); overflow: hidden; }
-.loader__line i {
-  position: absolute; inset: 0; background: var(--white);
-  transform: scaleX(var(--load, 0)); transform-origin: left;
-}
-.loader__count { color: var(--dim); font-variant-numeric: tabular-nums; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop { to { transform: scale(1); } }
 @keyframes up { to { opacity: 1; transform: none; } }
 
 /* ==========================================================
@@ -146,7 +147,7 @@ main { position: relative; z-index: 1; }
 }
 
 .logo { display: inline-flex; align-items: center; gap: var(--s3); min-height: 44px; font-weight: 500; letter-spacing: -.01em; }
-.logo__mark { width: 1.6rem; height: 1.6rem; flex: none; transition: transform 500ms var(--ease); }
+.logo__mark { width: 1.25rem; height: 1.25rem; flex: none; transition: transform 500ms var(--ease); }
 
 .menu { display: flex; gap: var(--s1); margin-left: auto; }
 .menu a {

@@ -42,9 +42,8 @@
   }
 
   if (motion && loader) {
-    var count = loader.querySelector('.loader__count');
     var started = performance.now();
-    var MIN = 1500;
+    var MIN = 2000;
     var assetsReady = false;
     var fontsDone = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     var loaded = new Promise(function (res) {
@@ -57,7 +56,6 @@
       var e = 1 - Math.pow(1 - t, 3);
       var p = Math.round(e * (assetsReady ? 100 : 96));
       loader.style.setProperty('--load', (p / 100).toFixed(3));
-      count.textContent = ('00' + p).slice(-3);
       if (t < 1 || !assetsReady) {
         if (now - started > 6000) { ready(); return; }       /* varovalka pri počasni povezavi */
         requestAnimationFrame(step);
