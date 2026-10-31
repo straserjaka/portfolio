@@ -146,7 +146,7 @@ main { position: relative; z-index: 1; }
 }
 
 .logo { display: inline-flex; align-items: center; gap: var(--s3); min-height: 44px; font-weight: 500; letter-spacing: -.01em; }
-.logo__dot { width: .65rem; height: .65rem; border-radius: 50%; background: currentColor; transition: transform 500ms var(--ease); }
+.logo__mark { width: 1.6rem; height: 1.6rem; flex: none; transition: transform 500ms var(--ease); }
 
 .menu { display: flex; gap: var(--s1); margin-left: auto; }
 .menu a {
@@ -250,28 +250,20 @@ main { position: relative; z-index: 1; }
 .flow__steps {
   position: relative;
   display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s6);
-  padding-top: var(--s7);
   --fp: 1;
 }
-.flow__steps::before, .flow__steps::after {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
-}
-.flow__steps::before { background: var(--rule); }
-.flow__steps::after  { background: var(--ink); transform: scaleX(var(--fp)); transform-origin: left; }
 
-.step { position: relative; display: grid; gap: var(--s4); align-content: start; }
-.step__node {
-  position: absolute; top: calc(var(--s7) * -1 - 6px); left: 0;
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--black); border: 1px solid var(--dim);
-  transition: background 500ms var(--ease), border-color 500ms var(--ease), transform 500ms var(--ease);
+.step { position: relative; display: grid; gap: var(--s3); align-content: start; }
+.step__no {
+  font-family: var(--mono, 'Geist Mono', monospace); font-size: .8125rem; letter-spacing: .08em; color: var(--dim);
+  transition: color 500ms var(--ease);
 }
 .step h3 { font-size: clamp(1.3rem, 2vw, 1.7rem); letter-spacing: -.03em; line-height: 1.1; }
 .step p { max-width: 22rem; color: var(--soft); }
 
 .motion .step { opacity: .3; transition: opacity 600ms var(--ease); }
 .motion .step.on { opacity: 1; }
-.motion .step.on .step__node { background: var(--white); border-color: var(--white); transform: scale(1.35); }
+.motion .step.on .step__no { color: var(--ink); }
 
 @media (min-width: 801px) {
   .motion .flow { height: 170vh; }
@@ -367,16 +359,16 @@ main { position: relative; z-index: 1; }
   padding-bottom: var(--s5);
 }
 .close__h {
-  font-size: clamp(2.2rem, 6vw, 4.5rem);
-  letter-spacing: -.045em; line-height: 1;
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  letter-spacing: -.035em; line-height: 1.05;
 }
 .close__h em { font-size: 1.06em; }
 .close__body { display: grid; gap: var(--s6); justify-items: start; }
-.close__lead { max-width: 30rem; font-size: 1.25rem; color: var(--soft); }
+.close__lead { max-width: 30rem; font-size: 1rem; color: var(--soft); }
 .close__mail {
   position: relative; display: inline-block; max-width: 100%;
-  font-size: clamp(1.7rem, 5.6vw, 5.5rem);
-  letter-spacing: -.05em; line-height: 1.1; font-weight: 450;
+  font-size: clamp(1.2rem, 2.6vw, 1.75rem);
+  letter-spacing: -.03em; line-height: 1.2; font-weight: 450;
   padding-bottom: .1em; overflow-wrap: anywhere;
 }
 .close__mail::after {
@@ -406,7 +398,7 @@ main { position: relative; z-index: 1; }
 }
 .contact .label { margin-bottom: var(--s4); }
 .contact__side { align-self: start; position: sticky; top: 6rem; }
-.contact__h { font-size: clamp(2rem, 3.8vw, 3.4rem); letter-spacing: -.05em; line-height: 1; }
+.contact__h { font-size: clamp(1.4rem, 2.2vw, 1.9rem); letter-spacing: -.035em; line-height: 1.1; }
 .contact__h em { font-size: 1.08em; }
 .contact__note { margin-top: var(--s4); max-width: 24rem; color: var(--soft); }
 .contact__meta { margin-top: var(--s6); max-width: 24rem; border-top: 1px solid var(--rule); }
@@ -525,7 +517,7 @@ main { position: relative; z-index: 1; }
    ========================================================== */
 @media (hover: hover) and (pointer: fine) {
   .menu a:hover::after { transform: scaleX(1); transform-origin: left; }
-  .logo:hover .logo__dot { transform: scale(1.5); }
+  .logo:hover .logo__mark { transform: rotate(-8deg) scale(1.08); }
 
   .btn:hover::before { transform: translateY(0); }
   .btn--solid:hover { color: var(--ink); }
@@ -585,8 +577,7 @@ main { position: relative; z-index: 1; }
 }
 
 @media (max-width: 800px) {
-  .flow__steps { grid-template-columns: 1fr; gap: var(--s7); padding-top: 0; }
-  .flow__steps::before, .flow__steps::after, .step__node { display: none; }
+  .flow__steps { grid-template-columns: 1fr; gap: var(--s7); }
   .motion .step { opacity: 1; }
   .step { padding-top: var(--s5); border-top: 1px solid var(--rule); }
   .flow__h { margin-bottom: var(--s7); }
