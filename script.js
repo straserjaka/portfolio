@@ -3,29 +3,11 @@
 
   var root = document.documentElement;
   var motion = root.classList.contains('motion');
-  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+  var smooth = function (a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
   /* ==========================================================
-     Ime v herou: razdelimo na črke (za učinek ob kazalcu)
-     ========================================================== */
-  var letters = [];
-  Array.prototype.forEach.call(document.querySelectorAll('[data-split]'), function (line) {
-    var text = line.textContent;
-    line.textContent = '';
-    for (var i = 0; i < text.length; i++) {
-      var s = document.createElement('span');
-      s.className = 'ch';
-      s.setAttribute('aria-hidden', 'true');
-      s.style.setProperty('--i', letters.length);
-      s.textContent = text[i];
-      line.appendChild(s);
-      letters.push(s);
-    }
-  });
-
-  /* ==========================================================
-     Nalaganje: ime, črta, števec. Nato se zavesa dvigne.
+     Nalaganje: logotip se nariše, nato se zavesa dvigne.
      ========================================================== */
   var loader = document.querySelector('.loader');
   var finished = false;
@@ -55,9 +37,6 @@
 
     (function step(now) {
       var t = clamp((now - started) / MIN, 0, 1);
-      var e = 1 - Math.pow(1 - t, 3);
-      var p = Math.round(e * (assetsReady ? 100 : 96));
-      loader.style.setProperty('--load', (p / 100).toFixed(3));
       if (t < 1 || !assetsReady) {
         if (now - started > 6000) { ready(); return; }       /* varovalka pri počasni povezavi */
         requestAnimationFrame(step);
@@ -67,161 +46,6 @@
     })(started);
   } else {
     ready();
-  }
-
-  /* ==========================================================
-     Interaktivno ozadje: konturne črte
-     - kazalec jih odrine in poveča
-     - klik/dotik sproži valovanje
-     - drsenje premakne mrežo
-     - v mirovanju diha (da je živo tudi na telefonu)
-     ========================================================== */
-  var cvs = document.querySelector('.bg');
-  var ctx = cvs.getContext('2d');
-  var W = 0, H = 0, dpr = 1, gap = 30, cols = 0, rows = 0;
-  var ptr = { x: -9999, y: -9999, sx: -9999, sy: -9999, on: 0, son: 0 };
-  var ripples = [];
-  var scrollY = window.scrollY, scrollSm = scrollY;
-
-  function size() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    cvs.width = Math.round(W * dpr); cvs.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    gap = W < 700 ? 26 : 32;
-    cols = Math.ceil(W / gap) + 2;
-    rows = Math.ceil(H / gap) + 2;
-    if (!motion) draw(0);
-  }
-
-  /* Valujoče konturne črte: počasi dihajo, kazalec jih razmakne in osvetli,
-     klik sproži val, drsenje jih premakne. Zelo subtilno, da ne moti branja. */
-  function draw(now) {
-    ctx.clearRect(0, 0, W, H);
-    var spacing = W < 700 ? 30 : 36;
-    var step = W < 700 ? 16 : 12;
-    var R = W < 700 ? 130 : 210;
-    var t = motion ? now * 0.001 : 0;
-    var off = -((scrollSm * 0.22) % spacing);
-    var lines = Math.ceil(H / spacing) + 3;
-    var pOn = ptr.son > 0.01;
-
-    ctx.lineWidth = 1;
-    ctx.lineJoin = 'round';
-
-    for (var j = -1; j < lines; j++) {
-      var by = j * spacing + off;
-      var near = 0;
-      if (pOn) {
-        var ldy = by - ptr.sy;
-        near = Math.exp(-(ldy * ldy) / (R * R * 0.55)) * ptr.son;
-      }
-      ctx.strokeStyle = 'rgba(255,255,255,' + (0.065 + near * 0.3).toFixed(3) + ')';
-      ctx.beginPath();
-
-      for (var x = -step; x <= W + step; x += step) {
-        var y = by
-          + Math.sin(x * 0.0055 + t * 0.45 + j * 0.33) * 10
-          + Math.sin(x * 0.012 - t * 0.3 + j * 0.21) * 5;
-
-        if (pOn) {
-          var dx = x - ptr.sx, dy = y - ptr.sy;
-          var g = Math.exp(-(dx * dx + dy * dy) / (R * R));
-          y += (dy / (Math.abs(dy) + 30)) * g * ptr.son * 26;
-        }
-
-        for (var k = 0; k < ripples.length; k++) {
-          var rp = ripples[k];
-          var age = now - rp.t;
-          var rdx = x - rp.x, rdy = y - rp.y;
-          var band = Math.abs(Math.sqrt(rdx * rdx + rdy * rdy) - age * 0.55);
-          if (band < 90) {
-            var w = (1 - band / 90) * Math.exp(-age / 1100);
-            y += (rdy / (Math.abs(rdy) + 30)) * w * 22;
-          }
-        }
-
-        if (x === -step) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    }
-  }
-
-  if (motion) {
-    size();
-    window.addEventListener('resize', size);
-
-    window.addEventListener('pointermove', function (e) {
-      ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = 1;
-      if (ptr.sx < -999) { ptr.sx = ptr.x; ptr.sy = ptr.y; }
-    }, { passive: true });
-    window.addEventListener('pointerdown', function (e) {
-      ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = 1;
-      if (ptr.sx < -999) { ptr.sx = ptr.x; ptr.sy = ptr.y; }
-      ripples.push({ x: e.clientX, y: e.clientY, t: performance.now() });
-      if (ripples.length > 4) ripples.shift();
-    }, { passive: true });
-    document.addEventListener('pointerleave', function () { ptr.on = 0; });
-    window.addEventListener('pointerup', function (e) { if (e.pointerType !== 'mouse') ptr.on = 0; }, { passive: true });
-    window.addEventListener('scroll', function () { scrollY = window.scrollY; }, { passive: true });
-
-    (function frame(now) {
-      ptr.sx += (ptr.x - ptr.sx) * 0.16;
-      ptr.sy += (ptr.y - ptr.sy) * 0.16;
-      ptr.son += (ptr.on - ptr.son) * 0.08;
-      scrollSm += (scrollY - scrollSm) * 0.12;
-      while (ripples.length && now - ripples[0].t > 2600) ripples.shift();
-      if (!document.hidden) draw(now);
-      requestAnimationFrame(frame);
-    })(performance.now());
-  } else {
-    size();
-    window.addEventListener('resize', size);
-  }
-
-  /* ==========================================================
-     Hero: črke odgovorijo kazalcu (le transform in opacity)
-     ========================================================== */
-  var hero = document.querySelector('.hero');
-  if (motion && fine && letters.length) {
-    var hp = null, hraf = 0, taken = false, gl = 0;
-    var hv = letters.map(function () { return 0; });
-
-    var htick = function () {
-      var moving = false;
-      gl += ((hp ? 1 : 0) - gl) * 0.1;
-      if (Math.abs((hp ? 1 : 0) - gl) > 0.002) moving = true;
-      for (var i = 0; i < letters.length; i++) {
-        var r = letters[i].getBoundingClientRect();
-        var target = 0;
-        if (hp) {
-          var d = Math.hypot(hp.x - (r.left + r.width / 2), hp.y - (r.top + r.height / 2));
-          target = clamp(1 - d / (r.height * 1.25), 0, 1);
-          target = target * target;
-        }
-        hv[i] += (target - hv[i]) * 0.14;
-        if (Math.abs(target - hv[i]) > 0.002) moving = true; else hv[i] = target;
-        letters[i].style.transform = 'translateY(' + (-hv[i] * 0.06).toFixed(4) + 'em) scale(' + (1 + hv[i] * 0.035).toFixed(4) + ')';
-        letters[i].style.opacity = (1 - gl * 0.38 * (1 - hv[i])).toFixed(3);
-      }
-      hraf = moving ? requestAnimationFrame(htick) : 0;
-    };
-    var hkick = function () { if (!hraf) hraf = requestAnimationFrame(htick); };
-
-    hero.addEventListener('pointermove', function (e) {
-      if (!root.classList.contains('ready')) return;
-      /* po vstopni animaciji prevzamemo transform in opacity */
-      if (!taken) {
-        taken = true;
-        letters.forEach(function (l) { l.style.opacity = "1"; l.style.transform = "none"; l.style.animation = "none"; });
-      }
-      hp = { x: e.clientX, y: e.clientY };
-      hkick();
-    });
-    hero.addEventListener('pointerleave', function () {
-      hp = null;
-      hkick();
-    });
   }
 
   /* ==========================================================
@@ -238,48 +62,85 @@
   if (clockEl) { tickClock(); setInterval(tickClock, 20000); }
 
   /* ==========================================================
-     Drsenje: napredek strani, trije sloji, časovnica
+     VRHUNEC: ime se sestavi iz bajtov v črke.
+     Vsaka črka ima tri sloje: bajti (baza), niz (strežnik),
+     črka (vmesnik). Napredek drsenja preliva sloje; črke si
+     sledijo z zamikom, zato se ime sestavlja od leve proti desni.
      ========================================================== */
-  var flow = document.querySelector('.flow');
-  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
-  var stepsBox = document.querySelector('.flow__steps');
-  var timeline = document.querySelector('.timeline');
-  var desktopFlow = window.matchMedia('(min-width: 801px)');
+  var compile = document.querySelector('.compile');
+  var buildEl = document.querySelector('[data-compile]');
+  var layers = Array.prototype.slice.call(document.querySelectorAll('.layer'));
+  var cells = [];
 
-  function onScroll() {
-    var y = window.scrollY;
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    root.style.setProperty('--prog', max > 0 ? (y / max).toFixed(4) : 0);
-
-    if (motion && desktopFlow.matches) {
-      var r = flow.getBoundingClientRect();
-      var total = r.height - window.innerHeight;
-      var p = total > 0 ? clamp(-r.top / total, 0, 1) : 0;
-      var q = clamp((p - 0.06) / 0.84, 0, 1);
-      stepsBox.style.setProperty('--fp', q.toFixed(4));
-      steps.forEach(function (s, i) { s.classList.toggle('on', q >= i / 3 - 0.001 && p > 0.02); });
-    } else if (motion) {
-      steps.forEach(function (s) { s.classList.add('on'); });
-    }
-
-    if (motion && timeline) {
-      var tr = timeline.getBoundingClientRect();
-      var tp = clamp((window.innerHeight * 0.6 - tr.top) / tr.height, 0, 1);
-      timeline.style.setProperty('--tp', tp.toFixed(4));
-    }
+  function utf8hex(ch) {
+    var bytes = unescape(encodeURIComponent(ch)), out = '';
+    for (var i = 0; i < bytes.length; i++) out += ('0' + bytes.charCodeAt(i).toString(16)).slice(-2);
+    return out.toUpperCase();
   }
 
-  var sticking = false;
+  if (motion && compile && buildEl) {
+    var full = Array.prototype.map.call(buildEl.querySelectorAll('.build__line'), function (l) { return l.textContent; }).join(' ');
+    buildEl.setAttribute('aria-label', full);
+    Array.prototype.forEach.call(buildEl.querySelectorAll('.build__line'), function (line) {
+      var text = line.textContent;
+      line.textContent = '';
+      line.setAttribute('aria-hidden', 'true');
+      for (var i = 0; i < text.length; i++) {
+        var c = text.charAt(i);
+        var cell = document.createElement('span');
+        cell.className = 'g';
+        cell.innerHTML = '<span class="g__glyph"></span><span class="g__hex"></span><span class="g__code"></span>';
+        cell.children[0].textContent = c;
+        cell.children[1].textContent = utf8hex(c);
+        cell.children[2].textContent = '"' + c + '"';
+        line.appendChild(cell);
+        cells.push({ glyph: cell.children[0], hex: cell.children[1], code: cell.children[2] });
+      }
+    });
+    var sr = document.createElement('span');
+    sr.className = 'sr';
+    sr.textContent = full;
+    buildEl.appendChild(sr);
+  }
+
+  var SPREAD = 0.3;
+  function paintCompile() {
+    var r = compile.getBoundingClientRect();
+    var total = r.height - window.innerHeight;
+    var p = total > 0 ? clamp(-r.top / total, 0, 1) : 0;
+    var t = clamp((p - 0.06) / 0.84, 0, 1);          /* držanje na začetku in koncu */
+    var n = cells.length;
+    cells.forEach(function (c, i) {
+      var d = n > 1 ? (i / (n - 1)) * SPREAD : 0;
+      var u = clamp((t - d) / (1 - SPREAD), 0, 1);
+      var toCode = smooth(0.2, 0.36, u);
+      var toGlyph = smooth(0.6, 0.78, u);
+      c.hex.style.opacity = (1 - toCode).toFixed(3);
+      c.code.style.opacity = (toCode * (1 - toGlyph)).toFixed(3);
+      c.glyph.style.opacity = toGlyph.toFixed(3);
+    });
+    var active = t < 0.34 ? 0 : (t < 0.67 ? 1 : 2);
+    layers.forEach(function (l, i) { l.classList.toggle('on', i === active && p > 0 && p < 1 || (p >= 1 && i === 2)); });
+  }
+
+  /* ==========================================================
+     Drsenje (en rAF na okvir)
+     ========================================================== */
+  var queued = false;
+  function onScroll() {
+    queued = false;
+    if (motion && cells.length) paintCompile();
+  }
   window.addEventListener('scroll', function () {
-    if (sticking) return;
-    sticking = true;
-    requestAnimationFrame(function () { sticking = false; onScroll(); });
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(onScroll);
   }, { passive: true });
   window.addEventListener('resize', onScroll);
   onScroll();
 
   /* ==========================================================
-     Vrstice se pokažejo ob vstopu
+     Naslovi projektov se odkrijejo ob vstopu
      ========================================================== */
   var items = document.querySelectorAll('[data-reveal]');
   if (motion && 'IntersectionObserver' in window) {
@@ -287,7 +148,7 @@
       entries.forEach(function (e) {
         if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.3 });
     items.forEach(function (el) { io.observe(el); });
   } else {
     items.forEach(function (el) { el.classList.add('in'); });
@@ -463,37 +324,4 @@
       } else { done('Ni uspelo'); }
     });
   });
-
-  /* Označi razdelek, v katerem si */
-  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.menu a'));
-  if ('IntersectionObserver' in window && navLinks.length) {
-    var spy = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (!en.isIntersecting) return;
-        navLinks.forEach(function (a) {
-          if (a.getAttribute('href') === '#' + en.target.id) a.setAttribute('aria-current', 'true');
-          else a.removeAttribute('aria-current');
-        });
-      });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    ['delo', 'projekti', 'pot', 'kontakt'].forEach(function (id) {
-      var s = document.getElementById(id);
-      if (s) spy.observe(s);
-    });
-  }
-
-  /* ==========================================================
-     Magnetni gumbi
-     ========================================================== */
-  if (motion && fine) {
-    Array.prototype.forEach.call(document.querySelectorAll('.magnet'), function (b) {
-      b.addEventListener('pointermove', function (e) {
-        var r = b.getBoundingClientRect();
-        var x = (e.clientX - (r.left + r.width / 2)) / r.width;
-        var y = (e.clientY - (r.top + r.height / 2)) / r.height;
-        b.style.transform = 'translate(' + (x * 12).toFixed(1) + 'px,' + (y * 10).toFixed(1) + 'px)';
-      });
-      b.addEventListener('pointerleave', function () { b.style.transform = ''; });
-    });
-  }
 })();
