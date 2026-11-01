@@ -4,155 +4,263 @@
   var root = document.documentElement;
   var motion = root.classList.contains('motion');
   var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
-  var smooth = function (a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  var $ = function (s, c) { return (c || document).querySelector(s); };
+  var $$ = function (s, c) { return Array.prototype.slice.call((c || document).querySelectorAll(s)); };
+  var NS = 'http://www.w3.org/2000/svg';
+  var svgEl = function (name, attrs) {
+    var e = document.createElementNS(NS, name);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  };
 
   /* ==========================================================
-     Nalaganje: logotip se nariše, nato se zavesa dvigne.
+     Nalaganje: kratko, nikoli ne zaklene drsenja
      ========================================================== */
-  var loader = document.querySelector('.loader');
-  var finished = false;
-
+  $$('.status, .name, .hero__row').forEach(function (el) { el.setAttribute('data-in', ''); });
+  var loader = $('.loader');
+  var done = false;
   function ready() {
-    if (finished) return;
-    finished = true;
-    root.classList.add('ready');
+    if (done) return;
+    done = true;
     root.classList.remove('loading');
-    if (loader) {
-      loader.classList.add('is-done');
-      setTimeout(function () { loader.classList.add('is-gone'); }, 1100);
+    root.classList.add('ready');
+    if (loader) loader.classList.add('is-done');
+    $$('[data-in]').forEach(function (el, i) { setTimeout(function () { el.classList.add('in'); }, 60 * i); });
+  }
+  setTimeout(ready, 1800);                         /* varovalka */
+  if (motion && loader) setTimeout(ready, 900); else ready();
+
+  /* ==========================================================
+     Napredek plošče: 0 ob vstopu, 1 ob izstopu
+     ========================================================== */
+  function plateProgress(el) {
+    var r = el.getBoundingClientRect();
+    var vh = window.innerHeight;
+    var span = r.height - vh * 0.5;
+    return span > 0 ? clamp((vh * 0.5 - r.top) / span, 0, 1) : clamp((vh - r.top) / (vh + r.height), 0, 1);
+  }
+
+  var specs = [];
+
+  /* ==========================================================
+     1. TripPlaner: višinski profil
+     ========================================================== */
+  (function () {
+    var plate = $('#tripplaner'); if (!plate) return;
+    var svg = $('.route', plate), line = $('.route__line', svg), area = $('.route__area', svg);
+    var rule = $('.route__rule', svg), dot = $('.route__dot', svg), grid = $('.route__grid', svg);
+    var rKm = $('[data-r="km"]', plate), rAlt = $('[data-r="alt"]', plate), rUp = $('[data-r="up"]', plate);
+    var N = 56, W = 800, H = 330, TOP = 24, BOT = 300, KM = 9.4;
+    var h = [];
+    for (var i = 0; i < N; i++) {
+      var x = i / (N - 1);
+      h.push(620 + 880 * Math.pow(x, 1.12) + 38 * Math.sin(i * .9) + 24 * Math.sin(i * 2.3));
     }
-  }
+    var min = Math.min.apply(null, h) - 30, max = Math.max.apply(null, h) + 30;
+    var X = function (t) { return t * W; };
+    var Y = function (v) { return BOT - (v - min) / (max - min) * (BOT - TOP); };
+    var d = '';
+    h.forEach(function (v, i) { d += (i ? 'L' : 'M') + X(i / (N - 1)).toFixed(1) + ' ' + Y(v).toFixed(1); });
+    line.setAttribute('d', d);
+    area.setAttribute('d', d + 'L' + W + ' ' + BOT + 'L0 ' + BOT + 'Z');
+    for (var g = 0; g < 4; g++) {
+      var gy = TOP + g * (BOT - TOP) / 3;
+      grid.appendChild(svgEl('line', { x1: 0, x2: W, y1: gy, y2: gy }));
+    }
+    var upTo = [0];
+    for (var j = 1; j < N; j++) upTo.push(upTo[j - 1] + Math.max(0, h[j] - h[j - 1]));
+    var manual = null;
 
-  setTimeout(ready, 7000);   /* varovalka: nalagalnik se nikoli ne zatakne */
+    function fmt(n, dec) { return n.toFixed(dec).replace('.', ','); }
+    function set(p) {
+      if (manual !== null) p = manual;
+      var f = p * (N - 1), i0 = Math.floor(f), i1 = Math.min(N - 1, i0 + 1), k = f - i0;
+      var alt = h[i0] + (h[i1] - h[i0]) * k, up = upTo[i0] + (upTo[i1] - upTo[i0]) * k;
+      var x = X(p), y = Y(alt);
+      line.style.strokeDashoffset = (1 - p).toFixed(4);
+      rule.setAttribute('x1', x); rule.setAttribute('x2', x);
+      dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      rKm.textContent = fmt(p * KM, 1) + ' km';
+      rAlt.textContent = Math.round(alt) + ' m';
+      rUp.textContent = Math.round(up) + ' m';
+    }
+    function pointer(e) {
+      var r = svg.getBoundingClientRect();
+      manual = clamp((e.clientX - r.left) / r.width, 0, 1);
+      set(0);
+    }
+    svg.addEventListener('pointermove', pointer);
+    svg.addEventListener('pointerdown', pointer);
+    svg.addEventListener('pointerleave', function () { manual = null; set(plateProgress(plate)); });
+    svg.style.touchAction = 'pan-y';
+    specs.push({ el: plate, set: function (p) { set(clamp(p * 1.25, 0, 1)); } });
+    set(motion ? 0 : 1);
+  })();
 
-  if (motion && loader) {
-    var started = performance.now();
-    var MIN = 2000;
-    var assetsReady = false;
-    var fontsDone = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
-    var loaded = new Promise(function (res) {
-      if (document.readyState === 'complete') res(); else window.addEventListener('load', res);
+  /* ==========================================================
+     2. BookWithStraser: izbira termina (vrhunec)
+     ========================================================== */
+  (function () {
+    var plate = $('#bookwithstraser'); if (!plate) return;
+    var box = $('[data-book]', plate), msg = $('[data-book-msg]', plate), ok = $('[data-book-confirm]', plate);
+    var days = ['Pon', 'Tor', 'Sre', 'Čet', 'Pet'];
+    var times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00'];
+    var taken = [[0, 0], [1, 2], [2, 1], [3, 4], [4, 0], [0, 3], [2, 4], [3, 1], [1, 5], [4, 3], [0, 5], [2, 2], [3, 3], [4, 5], [1, 0]];
+    var cells = {}, chosen = null, booked = false;
+
+    box.appendChild(document.createElement('span'));
+    days.forEach(function (d) { var s = document.createElement('span'); s.className = 'book__day'; s.textContent = d; box.appendChild(s); });
+    times.forEach(function (t, r) {
+      var tl = document.createElement('span'); tl.className = 'book__time'; tl.textContent = t; box.appendChild(tl);
+      days.forEach(function (dn, c) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'slot'; b.setAttribute('aria-pressed', 'false');
+        b.setAttribute('aria-label', dn + ' ' + t);
+        b.textContent = t.slice(0, 2);
+        b.addEventListener('click', function () { choose(c, r); });
+        box.appendChild(b); cells[c + ',' + r] = b;
+      });
     });
-    Promise.all([fontsDone, loaded]).then(function () { assetsReady = true; });
 
-    (function step(now) {
-      var t = clamp((now - started) / MIN, 0, 1);
-      if (t < 1 || !assetsReady) {
-        if (now - started > 6000) { ready(); return; }       /* varovalka pri počasni povezavi */
-        requestAnimationFrame(step);
-      } else {
-        setTimeout(ready, 200);
+    function choose(c, r) {
+      if (booked) return;
+      if (chosen) cells[chosen.c + ',' + chosen.r].setAttribute('aria-pressed', 'false');
+      chosen = { c: c, r: r };
+      cells[c + ',' + r].setAttribute('aria-pressed', 'true');
+      msg.textContent = 'Izbrano: ' + days[c] + ' ob ' + times[r] + '.';
+      ok.disabled = false; ok.textContent = 'Potrdi';
+    }
+    ok.addEventListener('click', function () {
+      if (booked) {
+        booked = false; var key = chosen && chosen.c + ',' + chosen.r;
+        if (key) cells[key].setAttribute('aria-pressed', 'false');
+        chosen = null; ok.disabled = true; ok.textContent = 'Potrdi';
+        msg.textContent = 'Izberi prost termin.'; return;
       }
-    })(started);
-  } else {
-    ready();
-  }
-
-  /* ==========================================================
-     Ura v Ptuju
-     ========================================================== */
-  var clockEl = document.querySelector('[data-clock]');
-  function tickClock() {
-    try {
-      clockEl.textContent = new Intl.DateTimeFormat('sl-SI', {
-        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Europe/Ljubljana'
-      }).format(new Date());
-    } catch (e) { /* ura ostane prazna */ }
-  }
-  if (clockEl) { tickClock(); setInterval(tickClock, 20000); }
-
-  /* ==========================================================
-     VRHUNEC: ime se sestavi iz bajtov v črke.
-     Vsaka črka ima tri sloje: bajti (baza), niz (strežnik),
-     črka (vmesnik). Napredek drsenja preliva sloje; črke si
-     sledijo z zamikom, zato se ime sestavlja od leve proti desni.
-     ========================================================== */
-  var compile = document.querySelector('.compile');
-  var buildEl = document.querySelector('[data-compile]');
-  var layers = Array.prototype.slice.call(document.querySelectorAll('.layer'));
-  var cells = [];
-
-  function utf8hex(ch) {
-    var bytes = unescape(encodeURIComponent(ch)), out = '';
-    for (var i = 0; i < bytes.length; i++) out += ('0' + bytes.charCodeAt(i).toString(16)).slice(-2);
-    return out.toUpperCase();
-  }
-
-  if (motion && compile && buildEl) {
-    var full = Array.prototype.map.call(buildEl.querySelectorAll('.build__line'), function (l) { return l.textContent; }).join(' ');
-    buildEl.setAttribute('aria-label', full);
-    Array.prototype.forEach.call(buildEl.querySelectorAll('.build__line'), function (line) {
-      var text = line.textContent;
-      line.textContent = '';
-      line.setAttribute('aria-hidden', 'true');
-      for (var i = 0; i < text.length; i++) {
-        var c = text.charAt(i);
-        var cell = document.createElement('span');
-        cell.className = 'g';
-        cell.innerHTML = '<span class="g__glyph"></span><span class="g__hex"></span><span class="g__code"></span>';
-        cell.children[0].textContent = c;
-        cell.children[1].textContent = utf8hex(c);
-        cell.children[2].textContent = '"' + c + '"';
-        line.appendChild(cell);
-        cells.push({ glyph: cell.children[0], hex: cell.children[1], code: cell.children[2] });
-      }
+      if (!chosen) return;
+      booked = true;
+      msg.textContent = 'Rezervirano: ' + days[chosen.c] + ' ob ' + times[chosen.r] + '. V pravi aplikaciji bi sledilo potrdilo po e-pošti.';
+      ok.textContent = 'Prekliči';
     });
-    var sr = document.createElement('span');
-    sr.className = 'sr';
-    sr.textContent = full;
-    buildEl.appendChild(sr);
-  }
 
-  var SPREAD = 0.3;
-  function paintCompile() {
-    var r = compile.getBoundingClientRect();
-    var total = r.height - window.innerHeight;
-    var p = total > 0 ? clamp(-r.top / total, 0, 1) : 0;
-    var t = clamp((p - 0.06) / 0.84, 0, 1);          /* držanje na začetku in koncu */
-    var n = cells.length;
-    cells.forEach(function (c, i) {
-      var d = n > 1 ? (i / (n - 1)) * SPREAD : 0;
-      var u = clamp((t - d) / (1 - SPREAD), 0, 1);
-      var toCode = smooth(0.2, 0.36, u);
-      var toGlyph = smooth(0.6, 0.78, u);
-      c.hex.style.opacity = (1 - toCode).toFixed(3);
-      c.code.style.opacity = (toCode * (1 - toGlyph)).toFixed(3);
-      c.glyph.style.opacity = toGlyph.toFixed(3);
-    });
-    var active = t < 0.34 ? 0 : (t < 0.67 ? 1 : 2);
-    layers.forEach(function (l, i) { l.classList.toggle('on', i === active && p > 0 && p < 1 || (p >= 1 && i === 2)); });
-  }
+    function set(p) {
+      var n = Math.round(clamp(p * 1.15, 0, 1) * taken.length);
+      taken.forEach(function (t, i) {
+        var b = cells[t[0] + ',' + t[1]];
+        var isChosen = chosen && chosen.c === t[0] && chosen.r === t[1];
+        var on = i < n && !isChosen;
+        if (b.disabled !== on) { b.disabled = on; b.setAttribute('aria-label', days[t[0]] + ' ' + times[t[1]] + (on ? ', zasedeno' : '')); }
+      });
+    }
+    specs.push({ el: plate, set: set });
+    set(motion ? 0 : 1);
+  })();
 
   /* ==========================================================
-     Drsenje (en rAF na okvir)
+     3. Road Alert: opozorila prihajajo
      ========================================================== */
+  (function () {
+    var plate = $('#roadalert'); if (!plate) return;
+    var list = $('.alerts__list', plate), pins = $('.alerts__pins', plate), count = $('[data-alert-count]', plate);
+    var data = [
+      { road: 'A1', kind: 'Zastoj', where: 'Maribor, proti Ljubljani', x: 210, y: 96, t: '12 min' },
+      { road: 'A4', kind: 'Delo na cesti', where: 'Ptuj, en pas zaprt', x: 232, y: 36, t: '3 km' },
+      { road: 'H2', kind: 'Opozorilo', where: 'Hitrost omejena zaradi vetra', x: 120, y: 218, t: '30 min' },
+      { road: 'A1', kind: 'Nesreča', where: 'Celje, počasna vožnja', x: 170, y: 118, t: '8 min' },
+      { road: 'R1', kind: 'Delo na cesti', where: 'Krožišče, izmenično enosmerno', x: 250, y: 232, t: '10 min' }
+    ];
+    var items = [], marks = [], on = -1, hot = -1;
+    data.forEach(function (a, i) {
+      var li = document.createElement('li');
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'alert';
+      b.innerHTML = '<b></b><span></span>';
+      b.firstChild.textContent = a.road;
+      var span = b.lastChild; span.textContent = a.kind;
+      var sm = document.createElement('small'); sm.textContent = a.where + ' · ' + a.t; span.appendChild(sm);
+      b.addEventListener('click', function () { focus(i); });
+      li.appendChild(b); list.appendChild(li); items.push(b);
+      var m = svgEl('circle', { class: 'pin', cx: a.x, cy: a.y, r: 9 });
+      pins.appendChild(m); marks.push(m);
+    });
+    function focus(i) {
+      hot = i;
+      items.forEach(function (b, k) { b.classList.toggle('is-hot', k === i); });
+      marks.forEach(function (m, k) { m.classList.toggle('is-hot', k === i); });
+    }
+    function set(p) {
+      var n = Math.round(clamp(p * 1.2, 0, 1) * data.length);
+      if (n === on) return; on = n;
+      items.forEach(function (b, k) { b.classList.toggle('is-on', k < n); });
+      marks.forEach(function (m, k) { m.classList.toggle('is-on', k < n); });
+      count.textContent = n + (n === 1 ? ' opozorilo' : (n === 2 ? ' opozorili' : (n < 5 ? ' opozorila' : ' opozoril')));
+      if (n > 0 && (hot < 0 || hot >= n)) focus(n - 1);
+    }
+    specs.push({ el: plate, set: set });
+    set(motion ? 0 : 1);
+    if (!motion) { on = -1; set(1); }
+  })();
+
+  /* ==========================================================
+     4. metaCleaner: vrstice se brišejo
+     ========================================================== */
+  (function () {
+    var plate = $('#metacleaner'); if (!plate) return;
+    var body = $('[data-meta]', plate), count = $('[data-meta-count]', plate), msg = $('[data-meta-msg]', plate), btn = $('[data-meta-toggle]', plate);
+    var rows = [['Naprava', 'Apple iPhone 14'], ['Čas posnetka', '2025-06-14 08:42:17'], ['Lokacija (GPS)', '46.42 N, 15.87 E'], ['Objektiv', 'f/1.5, 26 mm'], ['Programska oprema', 'iOS 17.5'], ['Serijska številka', 'F2LXK0Q4N6']];
+    var trs = rows.map(function (r) {
+      var tr = document.createElement('tr');
+      var th = document.createElement('th'); th.scope = 'row'; th.textContent = r[0];
+      var td = document.createElement('td'), sp = document.createElement('span'); sp.textContent = r[1]; td.appendChild(sp);
+      tr.appendChild(th); tr.appendChild(td); body.appendChild(tr); return tr;
+    });
+    var manual = null, last = -1;
+    function paint(n) {
+      if (n === last) return; last = n;
+      trs.forEach(function (tr, i) { tr.classList.toggle('is-gone', i < n); });
+      count.textContent = 'Odstranjeno ' + n + ' / ' + rows.length;
+      msg.textContent = n === rows.length ? 'Slika je čista, ostali so samo slikovni podatki.' : (n ? 'Metapodatki se brišejo.' : 'Metapodatki so še v sliki.');
+      btn.textContent = n === rows.length ? 'Obnovi' : 'Očisti';
+    }
+    btn.addEventListener('click', function () { manual = last === rows.length ? 0 : rows.length; paint(manual); });
+    specs.push({ el: plate, set: function (p) { if (manual !== null) return; paint(Math.round(clamp(p * 1.25, 0, 1) * rows.length)); } });
+    paint(0);
+    if (!motion) paint(0);
+  })();
+
+  /* ==========================================================
+     Drsenje: en rAF na okvir
+     ========================================================== */
+  var indexLinks = $$('.index__nav a');
+  var anchors = indexLinks.map(function (a) { return $(a.getAttribute('href')); });
   var queued = false;
   function onScroll() {
     queued = false;
-    if (motion && cells.length) paintCompile();
+    var y = window.scrollY, vh = window.innerHeight;
+    var max = document.documentElement.scrollHeight - vh;
+    root.style.setProperty('--prog', max > 0 ? (y / max).toFixed(4) : 0);
+
+    if (motion) specs.forEach(function (s) {
+      var r = s.el.getBoundingClientRect();
+      if (r.bottom < -vh * 0.5 || r.top > vh * 1.5) return;
+      s.set(plateProgress(s.el));
+    });
+
+    var cur = -1;
+    anchors.forEach(function (el, i) {
+      if (el && el.getBoundingClientRect().top < vh * 0.45 && !el.classList.contains('index__grp')) {
+        if (indexLinks[i].classList.contains('index__grp')) return;
+        cur = i;
+      }
+    });
+    indexLinks.forEach(function (a, i) { if (i === cur) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); });
   }
   window.addEventListener('scroll', function () {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(onScroll);
+    if (queued) return; queued = true; requestAnimationFrame(onScroll);
   }, { passive: true });
   window.addEventListener('resize', onScroll);
   onScroll();
 
-  /* ==========================================================
-     Naslovi projektov se odkrijejo ob vstopu
-     ========================================================== */
-  var items = document.querySelectorAll('[data-reveal]');
-  if (motion && 'IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.3 });
-    items.forEach(function (el) { io.observe(el); });
-  } else {
-    items.forEach(function (el) { el.classList.add('in'); });
-  }
 
   /* ==========================================================
      Kontaktni obrazec: vrstična validacija, napredek, uspeh
