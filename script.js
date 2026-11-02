@@ -98,62 +98,90 @@
   })();
 
   /* ==========================================================
-     2. BookWithStraser: izbira termina (vrhunec)
+     2. BookWithStraser: zemljevid z lokacijami glede na filter (vrhunec)
      ========================================================== */
   (function () {
     var plate = $('#bookwithstraser'); if (!plate) return;
-    var box = $('[data-book]', plate), msg = $('[data-book-msg]', plate), ok = $('[data-book-confirm]', plate);
-    var days = ['Pon', 'Tor', 'Sre', 'Čet', 'Pet'];
-    var times = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00'];
-    var taken = [[0, 0], [1, 2], [2, 1], [3, 4], [4, 0], [0, 3], [2, 4], [3, 1], [1, 5], [4, 3], [0, 5], [2, 2], [3, 3], [4, 5], [1, 0]];
-    var cells = {}, chosen = null, booked = false;
-
-    box.appendChild(document.createElement('span'));
-    days.forEach(function (d) { var s = document.createElement('span'); s.className = 'book__day'; s.textContent = d; box.appendChild(s); });
-    times.forEach(function (t, r) {
-      var tl = document.createElement('span'); tl.className = 'book__time'; tl.textContent = t; box.appendChild(tl);
-      days.forEach(function (dn, c) {
-        var b = document.createElement('button');
-        b.type = 'button'; b.className = 'slot'; b.setAttribute('aria-pressed', 'false');
-        b.setAttribute('aria-label', dn + ' ' + t);
-        b.textContent = t.slice(0, 2);
-        b.addEventListener('click', function () { choose(c, r); });
-        box.appendChild(b); cells[c + ',' + r] = b;
-      });
-    });
-
-    function choose(c, r) {
-      if (booked) return;
-      if (chosen) cells[chosen.c + ',' + chosen.r].setAttribute('aria-pressed', 'false');
-      chosen = { c: c, r: r };
-      cells[c + ',' + r].setAttribute('aria-pressed', 'true');
-      msg.textContent = 'Izbrano: ' + days[c] + ' ob ' + times[r] + '.';
-      ok.disabled = false; ok.textContent = 'Potrdi';
+    var svg = $('.map', plate), gGrid = $('.map__grid', svg), gArcs = $('.map__arcs', svg), gPins = $('.map__pins', svg), label = $('.map__label', svg);
+    var count = $('[data-map-count]', plate), msg = $('[data-map-msg]', plate), chips = $$('[data-filter]', plate);
+    var W = 800, H = 420;
+    var P = function (lon, lat) { return [(lon + 10) / 38 * W, (58 - lat) / 24 * H]; };
+    var data = [
+      { name: 'Ljubljana', lon: 14.5, lat: 46.05, kind: 'nastanitev', home: true },
+      { name: 'Pariz', lon: 2.35, lat: 48.9, kind: 'let' },
+      { name: 'Rim', lon: 12.5, lat: 41.9, kind: 'nastanitev' },
+      { name: 'Dunaj', lon: 16.4, lat: 48.2, kind: 'let' },
+      { name: 'Barcelona', lon: 2.2, lat: 41.4, kind: 'nastanitev' },
+      { name: 'Atene', lon: 23.7, lat: 38, kind: 'let' },
+      { name: 'Praga', lon: 14.4, lat: 50.1, kind: 'nastanitev' },
+      { name: 'Lizbona', lon: -9.1, lat: 38.7, kind: 'let' }
+    ];
+    var home = P(14.5, 46.05);
+    for (var g = 0; g < 5; g++) {
+      var gy = 24 + g * (H - 48) / 4;
+      gGrid.appendChild(svgEl('line', { x1: 0, x2: W, y1: gy, y2: gy }));
     }
-    ok.addEventListener('click', function () {
-      if (booked) {
-        booked = false; var key = chosen && chosen.c + ',' + chosen.r;
-        if (key) cells[key].setAttribute('aria-pressed', 'false');
-        chosen = null; ok.disabled = true; ok.textContent = 'Potrdi';
-        msg.textContent = 'Izberi prost termin.'; return;
+    for (var v = 0; v < 9; v++) {
+      var gx = 40 + v * (W - 80) / 8;
+      gGrid.appendChild(svgEl('line', { x1: gx, x2: gx, y1: 0, y2: H }));
+    }
+
+    var filter = 'vse', prog = motion ? 0 : 1, hot = -1;
+    var pins = [], arcs = [];
+    data.forEach(function (d, i) {
+      var xy = P(d.lon, d.lat); d.x = xy[0]; d.y = xy[1];
+      var pin = svgEl('g', { class: 'map__pin map__pin--' + d.kind, tabindex: -1, role: 'button', 'aria-label': d.name + ', ' + (d.kind === 'let' ? 'let' : 'nastanitev') });
+      pin.appendChild(svgEl('circle', { class: 'map__hit', cx: d.x, cy: d.y, r: 24 }));
+      pin.appendChild(svgEl('circle', { class: 'map__dot', cx: d.x, cy: d.y, r: 11 }));
+      pin.addEventListener('click', function () { focus(i); });
+      pin.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); focus(i); } });
+      gPins.appendChild(pin); pins.push(pin);
+      var arc = null;
+      if (d.kind === 'let') {
+        var mx = (home[0] + d.x) / 2, my = Math.min(home[1], d.y) - 36 - Math.abs(home[0] - d.x) * .08;
+        arc = svgEl('path', { class: 'map__arc', d: 'M' + home[0].toFixed(1) + ' ' + home[1].toFixed(1) + 'Q' + mx.toFixed(1) + ' ' + my.toFixed(1) + ' ' + d.x.toFixed(1) + ' ' + d.y.toFixed(1) });
+        gArcs.appendChild(arc);
       }
-      if (!chosen) return;
-      booked = true;
-      msg.textContent = 'Rezervirano: ' + days[chosen.c] + ' ob ' + times[chosen.r] + '. V pravi aplikaciji bi sledilo potrdilo po e-pošti.';
-      ok.textContent = 'Prekliči';
+      arcs.push(arc);
     });
 
-    function set(p) {
-      var n = Math.round(clamp(p * 1.15, 0, 1) * taken.length);
-      taken.forEach(function (t, i) {
-        var b = cells[t[0] + ',' + t[1]];
-        var isChosen = chosen && chosen.c === t[0] && chosen.r === t[1];
-        var on = i < n && !isChosen;
-        if (b.disabled !== on) { b.disabled = on; b.setAttribute('aria-label', days[t[0]] + ' ' + times[t[1]] + (on ? ', zasedeno' : '')); }
-      });
+    function plural(n) { return n + (n === 1 ? ' lokacija' : (n === 2 ? ' lokaciji' : (n < 5 && n > 0 ? ' lokacije' : ' lokacij'))); }
+    function focus(i) {
+      hot = i;
+      pins.forEach(function (p, k) { p.classList.toggle('is-hot', k === i); });
+      if (i < 0) { label.classList.remove('is-on'); return; }
+      var d = data[i];
+      label.textContent = d.name;
+      label.setAttribute('x', clamp(d.x, 50, W - 50)); label.setAttribute('y', d.y - 22 < 18 ? d.y + 34 : d.y - 22);
+      label.classList.add('is-on');
+      msg.textContent = d.home ? d.name + ': izhodišče letov.' : d.name + ': ' + (d.kind === 'let' ? 'let iz Ljubljane.' : 'nastanitev.');
     }
-    specs.push({ el: plate, set: set });
-    set(motion ? 0 : 1);
+    function render() {
+      var vis = [];
+      data.forEach(function (d, i) { if (filter === 'vse' || d.home || d.kind === filter) vis.push(i); });
+      var n = Math.round(clamp(prog * 1.15, 0, 1) * vis.length);
+      var shown = 0;
+      data.forEach(function (d, i) {
+        var idx = vis.indexOf(i);
+        var on = idx > -1 && idx < n;
+        pins[i].classList.toggle('is-on', on);
+        pins[i].setAttribute('tabindex', on ? 0 : -1);
+        if (arcs[i]) arcs[i].classList.toggle('is-on', on);
+        if (on) shown++;
+      });
+      count.textContent = plural(shown);
+      if (hot > -1 && !pins[hot].classList.contains('is-on')) focus(-1);
+    }
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        filter = c.getAttribute('data-filter');
+        chips.forEach(function (o) { o.setAttribute('aria-pressed', o === c ? 'true' : 'false'); });
+        msg.textContent = filter === 'vse' ? 'Prikazane vse lokacije.' : (filter === 'let' ? 'Prikazani leti iz Ljubljane.' : 'Prikazane nastanitve.');
+        render();
+      });
+    });
+    specs.push({ el: plate, set: function (p) { prog = p; render(); } });
+    render();
   })();
 
   /* ==========================================================

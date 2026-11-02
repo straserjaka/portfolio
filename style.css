@@ -73,7 +73,7 @@ button { font: inherit; color: inherit; }
 .skip:focus-visible { transform: none; }
 
 /* Mono oznake */
-.status, .schema dt, .meta dt, .spec__head, .readout dt, .close__foot, .index__nav, figcaption, .book__day, .book__msg {
+.status, .schema dt, .meta dt, .spec__head, .readout dt, .close__foot, .index__nav, figcaption, .book__msg {
   font-family: var(--mono); font-size: .75rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
 }
 
@@ -185,19 +185,27 @@ button { font: inherit; color: inherit; }
 .readout dt { color: var(--dim); }
 .readout dd { margin-top: var(--s1); font-size: clamp(1.35rem, 2.4vw, 2rem); letter-spacing: -.03em; font-variant-numeric: tabular-nums; font-weight: 500; }
 
-/* --- Rezervacije --- */
-.book { display: grid; grid-template-columns: 3.5rem repeat(5, minmax(0, 1fr)); gap: 6px; padding: var(--s5); }
-.book__day { color: var(--dim); text-align: center; padding-bottom: var(--s2); }
-.book__time { font-family: var(--mono); font-size: .75rem; color: var(--dim); align-self: center; }
-.slot {
-  min-height: 44px; border-radius: 8px; border: 1px solid var(--rule); background: transparent; cursor: pointer;
-  font-family: var(--mono); font-size: .6875rem; color: var(--soft);
-  transition: background-color 250ms var(--ease), border-color 250ms var(--ease), color 250ms var(--ease), transform 250ms var(--ease);
+/* --- Zemljevid --- */
+.chips { display: flex; flex-wrap: wrap; gap: var(--s2); padding: var(--s4) var(--s5) 0; }
+.chip {
+  min-height: 44px; padding: 0 var(--s4); border-radius: 999px; border: 1px solid var(--rule); background: transparent; color: var(--soft);
+  font-family: var(--mono); font-size: .75rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+  transition: background-color 250ms var(--ease), border-color 250ms var(--ease), color 250ms var(--ease);
 }
-.slot { border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
-.slot:disabled { cursor: not-allowed; border-color: transparent; color: transparent; background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ink) 16%, transparent) 0 2px, transparent 2px 7px); }
-.slot[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
-.plate--peak .slot[aria-pressed="true"] { color: #0B0B0B; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.map { display: block; width: 100%; height: auto; padding: var(--s5); }
+.map__grid line { stroke: var(--rule); stroke-width: 1; }
+.map__arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 4 6; stroke-linecap: round; opacity: 0; transition: opacity 400ms var(--ease); }
+.map__arc.is-on { opacity: .75; }
+.map__pin { cursor: pointer; opacity: 0; pointer-events: none; transform-box: fill-box; transform-origin: center; transform: scale(.4); transition: opacity 400ms var(--ease), transform 500ms var(--ease); outline: none; }
+.map__pin.is-on { opacity: 1; transform: none; pointer-events: auto; }
+.map__hit { fill: transparent; }
+.map__dot { fill: var(--ink); stroke: var(--surface); stroke-width: 3; transition: fill 250ms; }
+.map__pin--let .map__dot { fill: var(--surface); stroke: var(--ink); }
+.map__pin.is-hot .map__dot { fill: var(--accent); stroke: var(--surface); }
+.map__pin:focus-visible .map__dot { stroke: var(--accent); }
+.map__label { font-family: var(--mono); font-size: 15px; font-weight: 500; fill: var(--ink); letter-spacing: .04em; opacity: 0; transition: opacity 250ms var(--ease); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; pointer-events: none; }
+.map__label.is-on { opacity: 1; }
 .book__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s4) var(--s5); border-top: 1px solid var(--rule); }
 .book__msg { color: var(--soft); text-transform: none; letter-spacing: .02em; font-size: .8125rem; }
 .book__btn {
@@ -392,7 +400,7 @@ button { font: inherit; color: inherit; }
   .form__submit:hover .form__arrow { transform: translateX(4px); }
   .field:hover input, .field:hover textarea { border-bottom-color: var(--soft); }
   .ul:hover { text-decoration-color: currentColor; }
-  .slot:not(:disabled):hover { border-color: var(--accent); color: var(--ink); }
+  .chip[aria-pressed="false"]:hover { border-color: var(--ink); color: var(--ink); }
   .alert:hover { border-color: var(--accent); }
   .close__foot a:hover { color: var(--ink); }
 }
@@ -424,8 +432,11 @@ button { font: inherit; color: inherit; }
   .index__nav a { padding: 0 var(--s2); }
   .meta { grid-template-columns: 1fr; gap: var(--s4); }
   .schema > div, .schema--row > div { grid-template-columns: 6rem minmax(0, 1fr); gap: var(--s3); }
-  .book { grid-template-columns: 2.75rem repeat(5, minmax(0, 1fr)); gap: 4px; padding: var(--s3); }
-  .slot { min-height: 40px; font-size: .625rem; }
+  .chips { padding: var(--s3) var(--s3) 0; }
+  .map { padding: var(--s3); }
+  .map__dot { r: 17px; }
+  .map__hit { r: 34px; }
+  .map__label { font-size: 24px; }
   .readout > div { padding: var(--s3); }
   .meta-table th, .meta-table td { padding: var(--s3); }
   .meta-table th { width: 42%; }

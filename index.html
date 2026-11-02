@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
@@ -115,20 +115,30 @@
           <h3 class="plate__name" id="h-book">BookWithStraser</h3>
           <dl class="schema">
             <div><dt>Vrsta</dt><dd>Spletna aplikacija</dd></div>
-            <div><dt>Namen</dt><dd>Spletne rezervacije s prijavo, upravljanjem terminov in REST API-jem.</dd></div>
-            <div><dt>Tehnologije</dt><dd>Angular, Node.js, MongoDB</dd></div>
+            <div><dt>Namen</dt><dd>Rezervacija letov in nastanitev z interaktivnim zemljevidom lokacij.</dd></div>
+            <div><dt>Tehnologije</dt><dd>Angular, Node.js, Express, MongoDB, SCSS</dd></div>
+            <div><dt>Leto</dt><dd>2024–2025, maturitetni izdelek</dd></div>
           </dl>
         </div>
         <figure class="plate__spec">
           <div class="spec spec--book">
-            <div class="spec__head"><span>Izberi termin</span><span data-book-week>Vzorčni teden</span></div>
-            <div class="book" data-book role="group" aria-label="Izbira termina"></div>
+            <div class="spec__head"><span>Zemljevid</span><span data-map-count>0 lokacij</span></div>
+            <div class="chips" role="group" aria-label="Filter iskanja">
+              <button class="chip" type="button" data-filter="vse" aria-pressed="true">Vse</button>
+              <button class="chip" type="button" data-filter="let" aria-pressed="false">Leti</button>
+              <button class="chip" type="button" data-filter="nastanitev" aria-pressed="false">Nastanitve</button>
+            </div>
+            <svg class="map" viewBox="0 0 800 420" role="img" aria-label="Shematski zemljevid Evrope z lokacijami glede na izbrani filter">
+              <g class="map__grid"></g>
+              <g class="map__arcs"></g>
+              <g class="map__pins"></g>
+              <text class="map__label" x="0" y="0" text-anchor="middle"></text>
+            </svg>
             <div class="book__bar">
-              <p class="book__msg" data-book-msg role="status" aria-live="polite">Izberi prost termin.</p>
-              <button class="book__btn" type="button" data-book-confirm disabled>Potrdi</button>
+              <p class="book__msg" data-map-msg role="status" aria-live="polite">Izberi filter ali lokacijo.</p>
             </div>
           </div>
-          <figcaption>Vzorčni termini, delujoča izbira. Zasedenost se polni med drsenjem.</figcaption>
+          <figcaption>Vzorčne lokacije, shematski prikaz. Lokacije se pojavljajo med drsenjem; filter jih razvršča, klik jih označi.</figcaption>
         </figure>
       </div>
     </section>
@@ -301,6 +311,6 @@
 
   </main>
 
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>
