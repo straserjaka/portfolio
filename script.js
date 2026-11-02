@@ -101,7 +101,7 @@
      2. BookWithStraser: zemljevid z lokacijami glede na filter (vrhunec)
      ========================================================== */
   (function () {
-    var plate = $('#bookwithstraser'); if (!plate) return;
+    var plate = $('#bookwithstraser'); if (!plate || !$('.map', plate)) return;
     var svg = $('.map', plate), gGrid = $('.map__grid', svg), gArcs = $('.map__arcs', svg), gPins = $('.map__pins', svg), label = $('.map__label', svg);
     var count = $('[data-map-count]', plate), msg = $('[data-map-msg]', plate), chips = $$('[data-filter]', plate);
     var W = 800, H = 420;
