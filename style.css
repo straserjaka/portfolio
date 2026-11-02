@@ -194,18 +194,23 @@ button { font: inherit; color: inherit; }
 }
 .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
 .map { display: block; width: 100%; height: auto; padding: var(--s5); }
-.map__grid line { stroke: var(--rule); stroke-width: 1; }
-.map__arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 4 6; stroke-linecap: round; opacity: 0; transition: opacity 400ms var(--ease); }
-.map__arc.is-on { opacity: .75; }
+.map__land { fill: url(#land-dots); }
+.map pattern circle { fill: var(--ink); fill-opacity: .32; }
+.map__arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; stroke-linecap: round; opacity: 0; transition: opacity 400ms var(--ease); }
+.map__arc.is-on { opacity: .85; }
 .map__pin { cursor: pointer; opacity: 0; pointer-events: none; transform-box: fill-box; transform-origin: center; transform: scale(.4); transition: opacity 400ms var(--ease), transform 500ms var(--ease); outline: none; }
 .map__pin.is-on { opacity: 1; transform: none; pointer-events: auto; }
 .map__hit { fill: transparent; }
 .map__dot { fill: var(--ink); stroke: var(--surface); stroke-width: 3; transition: fill 250ms; }
 .map__pin--let .map__dot { fill: var(--surface); stroke: var(--ink); }
+.map__pin--home .map__dot { fill: var(--accent); stroke: var(--surface); }
 .map__pin.is-hot .map__dot { fill: var(--accent); stroke: var(--surface); }
 .map__pin:focus-visible .map__dot { stroke: var(--accent); }
-.map__label { font-family: var(--mono); font-size: 15px; font-weight: 500; fill: var(--ink); letter-spacing: .04em; opacity: 0; transition: opacity 250ms var(--ease); paint-order: stroke; stroke: var(--surface); stroke-width: 5px; pointer-events: none; }
-.map__label.is-on { opacity: 1; }
+.map__ring { fill: none; stroke: var(--accent); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: map-ping 2.4s var(--ease) infinite; pointer-events: none; }
+@keyframes map-ping { 0% { transform: scale(.7); opacity: .8; } 100% { transform: scale(2.6); opacity: 0; } }
+.map__tag { display: none; font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: .04em; fill: var(--soft); paint-order: stroke; stroke: var(--surface); stroke-width: 4px; pointer-events: none; }
+.map__pin.is-hot .map__tag { display: block; fill: var(--ink); }
+@media (min-width: 901px) { .map__tag { display: block; } }
 .book__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s4) var(--s5); border-top: 1px solid var(--rule); }
 .book__msg { color: var(--soft); text-transform: none; letter-spacing: .02em; font-size: .8125rem; }
 .book__btn {
@@ -436,7 +441,7 @@ button { font: inherit; color: inherit; }
   .map { padding: var(--s3); }
   .map__dot { r: 17px; }
   .map__hit { r: 34px; }
-  .map__label { font-size: 24px; }
+  .map__tag { font-size: 24px; }
   .readout > div { padding: var(--s3); }
   .meta-table th, .meta-table td { padding: var(--s3); }
   .meta-table th { width: 42%; }

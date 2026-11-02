@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
   <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
@@ -128,17 +128,17 @@
               <button class="chip" type="button" data-filter="let" aria-pressed="false">Leti</button>
               <button class="chip" type="button" data-filter="nastanitev" aria-pressed="false">Nastanitve</button>
             </div>
-            <svg class="map" viewBox="0 0 800 420" role="img" aria-label="Shematski zemljevid Evrope z lokacijami glede na izbrani filter">
-              <g class="map__grid"></g>
+            <svg class="map" viewBox="0 0 800 500" role="img" aria-label="Shematski zemljevid Evrope, narisan s pikami, z leti iz Ljubljane in nastanitvami glede na izbrani filter">
+              <defs><pattern id="land-dots" width="13" height="13" patternUnits="userSpaceOnUse"><circle cx="6.5" cy="6.5" r="1.7"/></pattern></defs>
+              <path class="map__land" d=""/>
               <g class="map__arcs"></g>
               <g class="map__pins"></g>
-              <text class="map__label" x="0" y="0" text-anchor="middle"></text>
             </svg>
             <div class="book__bar">
               <p class="book__msg" data-map-msg role="status" aria-live="polite">Izberi filter ali lokacijo.</p>
             </div>
           </div>
-          <figcaption>Vzorčne lokacije, shematski prikaz. Lokacije se pojavljajo med drsenjem; filter jih razvršča, klik jih označi.</figcaption>
+          <figcaption>Vzorčne lokacije, shematski prikaz. Drsenje samo išče in menja filter; klik na filter ali lokacijo prevzame nadzor.</figcaption>
         </figure>
       </div>
     </section>
@@ -311,6 +311,6 @@
 
   </main>
 
-  <script src="script.js?v=9"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>
