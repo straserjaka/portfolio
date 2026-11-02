@@ -104,10 +104,10 @@
     var plate = $('#bookwithstraser'); if (!plate) return;
     var svg = $('.map', plate), gGrid = $('.map__grid', svg), gArcs = $('.map__arcs', svg), gPins = $('.map__pins', svg), label = $('.map__label', svg);
     var count = $('[data-map-count]', plate), msg = $('[data-map-msg]', plate), chips = $$('[data-filter]', plate);
-    var W = 800, H = 330;
+    var W = 800, H = 420;
     var P = function (lon, lat) { return [(lon + 10) / 38 * W, (58 - lat) / 24 * H]; };
     var data = [
-      { name: 'Ljubljana', lon: 14.5, lat: 46.05, kind: 'nastanitev' },
+      { name: 'Ljubljana', lon: 14.5, lat: 46.05, kind: 'nastanitev', home: true },
       { name: 'Pariz', lon: 2.35, lat: 48.9, kind: 'let' },
       { name: 'Rim', lon: 12.5, lat: 41.9, kind: 'nastanitev' },
       { name: 'Dunaj', lon: 16.4, lat: 48.2, kind: 'let' },
@@ -154,11 +154,11 @@
       label.textContent = d.name;
       label.setAttribute('x', clamp(d.x, 50, W - 50)); label.setAttribute('y', d.y - 22 < 18 ? d.y + 34 : d.y - 22);
       label.classList.add('is-on');
-      msg.textContent = d.name + ': ' + (d.kind === 'let' ? 'let iz Ljubljane.' : 'nastanitev.');
+      msg.textContent = d.home ? d.name + ': izhodišče letov.' : d.name + ': ' + (d.kind === 'let' ? 'let iz Ljubljane.' : 'nastanitev.');
     }
     function render() {
       var vis = [];
-      data.forEach(function (d, i) { if (filter === 'vse' || d.kind === filter) vis.push(i); });
+      data.forEach(function (d, i) { if (filter === 'vse' || d.home || d.kind === filter) vis.push(i); });
       var n = Math.round(clamp(prog * 1.15, 0, 1) * vis.length);
       var shown = 0;
       data.forEach(function (d, i) {

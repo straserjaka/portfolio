@@ -434,6 +434,9 @@ button { font: inherit; color: inherit; }
   .schema > div, .schema--row > div { grid-template-columns: 6rem minmax(0, 1fr); gap: var(--s3); }
   .chips { padding: var(--s3) var(--s3) 0; }
   .map { padding: var(--s3); }
+  .map__dot { r: 17px; }
+  .map__hit { r: 34px; }
+  .map__label { font-size: 24px; }
   .readout > div { padding: var(--s3); }
   .meta-table th, .meta-table td { padding: var(--s3); }
   .meta-table th { width: 42%; }
